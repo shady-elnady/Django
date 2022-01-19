@@ -1,6 +1,6 @@
 from django.db import models
 from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
-from django.contrib.postgres.fields import ArrayField
+from djongo.models import ArrayField
 from Products.models import Product
 
 # Create your models here.
@@ -19,11 +19,15 @@ class AntiBiotic(BaseModelName):
 class Unit(BaseModelName):
   pass
 
+class ShortCutParameter(models.Model):
+  name = models.CharField(max_length=30)
+
+  class Meta:
+    abstract = True
 
 class Parameter(BaseModelName):
   shortcuts = ArrayField(
-    models.CharField(max_length=10, unique=True),
-    unique=True,
+    model_container=ShortCutParameter,
   )
   units = models.ManyToManyField(Unit)
 
@@ -76,8 +80,8 @@ class Analyzer(BaseModelName, BaseModel):
 
 
 class Kat(BaseModel):
-  serial = models.ForeignKey(
-      Product, on_delete=models.CASCADE, related_name="kats", primary_key=True
+  serial = models.OneToOneField(
+      Product, on_delete=models.CASCADE, related_name="kats",
   )
     
 

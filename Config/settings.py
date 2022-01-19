@@ -96,14 +96,31 @@ WSGI_APPLICATION = 'Config.wsgi.application'
 #     }
 # }
 
-
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        'NAME': 'djongo',
+        # 'NAME': 'djongo',
+        # 'ENFORCE_SCHEMA': False,
+        'CLIENT': {
+            'host': 'mongodb+srv://shadyelnady:ShN_0502910850@cluster0.bxjud.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+            # 'port': port_number,
+            # 'username': 'db-username',
+            # 'password': 'password',
+            # 'authSource': 'db-name',
+            'name': 'nady_lab',
+            'authMechanism': 'SCRAM-SHA-1'
+        },
+        'LOGGING': {
+            'version': 1,
+            'loggers': {
+                'djongo': {
+                    'level': 'DEBUG',
+                    'propagate': False,                        
+                }
+            },
+            },
     }
 }
-
 # DATABASES = {
 #     "default": dj_database_url.parse(config("DATABASE_URL"), conn_max_age=3600)
 # }

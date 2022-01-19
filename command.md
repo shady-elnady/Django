@@ -16,6 +16,8 @@ pip3 install djongo
 pip3 install django-mongoengine
 pip3 install django-polymorphic-tree
 pip3 install gunicorn
+pip3 install Pillow
+pip3 install dnspython
 
 python3 manage.py makemigrations
 python3 manage.py migrate

@@ -13,10 +13,10 @@ class Person(BaseModel):
       upload_to="images", editable=True, null=True, blank=True
   )
   gender = models.ForeignKey(
-      Gender, on_delete=models.SET_NULL, related_name="persons"
+      Gender, on_delete=models.CASCADE, related_name="persons"
   )
-  Job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name="persons")
-  title = models.ForeignKey(Title, on_delete=models.SET_NULL, related_name="persons")
+  Job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name="persons", null=True, blank=True)
+  title = models.ForeignKey(Title, on_delete=models.SET('Deleted'), related_name="persons", null=True, blank=True)
   
 
 class Doctor():
