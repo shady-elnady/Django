@@ -48,6 +48,8 @@ INSTALLED_APPS = [
     'GraphQL',
     'Libraries',
     'Utils',
+    'Persons',
+    'Products',
 ]
 
 MIDDLEWARE = [
@@ -154,7 +156,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SPAGHETTI_SAUCE = {
-    'apps': ['auth', 'Person'],
+    'apps': ['auth', 'Persons'],
     'show_fields': True,
     'exclude': {'auth': ['user']},
     'show_proxy':True,
