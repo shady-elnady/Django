@@ -11,6 +11,7 @@ python3 manage.py startapp Utils
 
 pip3 install djongo
 pip3 install django-mongoengine
+pip3 install django-polymorphic-tree
 pip3 install gunicorn
 
 python3 manage.py makemigrations

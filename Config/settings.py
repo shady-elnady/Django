@@ -39,6 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    ## Libraries
+    'django_spaghetti',
+    'polymorphic_tree',
+    'polymorphic',
+    'mptt',
+    ## My Apps
     'GraphQL',
     'Libraries',
     'Utils',
@@ -146,3 +152,10 @@ MEDIA_ROOT = BASE_DIR / 'media'
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+SPAGHETTI_SAUCE = {
+    'apps': ['auth', 'Person'],
+    'show_fields': True,
+    'exclude': {'auth': ['user']},
+    'show_proxy':True,
+}
