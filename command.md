@@ -8,6 +8,7 @@ django-admin startproject Config .
 python3 manage.py startapp GraphQL
 python3 manage.py startapp Persons
 python3 manage.py startapp Products
+python3 manage.py startapp Nady_System
 python3 manage.py startapp Libraries
 python3 manage.py startapp Utils
 

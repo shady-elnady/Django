@@ -50,6 +50,7 @@ INSTALLED_APPS = [
     'Utils',
     'Persons',
     'Products',
+    'Nady_System',
 ]
 
 MIDDLEWARE = [
