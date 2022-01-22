@@ -98,3 +98,4 @@ class Address(BaseModelNative):
   street = models.ForeignKey(Street, related_name="address", on_delete=models.CASCADE)
   house = models.CharField(max_length=50)
   location = models.CharField(max_length=100) # add Lat and Lang for Google Maps
+

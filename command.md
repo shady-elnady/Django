@@ -5,6 +5,7 @@ pip3 install django
 pip3 install python-decouple
 django-admin startproject Config .
 
+# Apps
 python3 manage.py startapp GraphQL
 python3 manage.py startapp Persons
 python3 manage.py startapp Products
@@ -12,13 +13,18 @@ python3 manage.py startapp Nady_System
 python3 manage.py startapp Libraries
 python3 manage.py startapp Utils
 
+# Libraries
 pip3 install djongo
 pip3 install django-mongoengine
 pip3 install django-polymorphic-tree
 pip3 install gunicorn
 pip3 install Pillow
 pip3 install dnspython
+pip3 install graphene-django
+pip3 install django-filter
+pip3 install django-graphql-jwt
 
+# Commands
 python3 manage.py makemigrations
 python3 manage.py migrate
 python3 manage.py runserver
@@ -27,3 +33,6 @@ pip3 freeze > requirements.txt
 deactivate
 
 pip3 install -r requirements.txt
+
+# fixtures
+python manage.py loaddata Persons

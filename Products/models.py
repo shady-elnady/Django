@@ -14,9 +14,3 @@ class Product(BaseModelName):
   serial = models.CharField(max_length=50, unique=True)
   brand = models.ForeignKey(Brand, related_name="products", on_delete=models.CASCADE)
   volume = models.PositiveSmallIntegerField()
-   
-
-class Branch(BaseModel):
-  name = models.CharField(max_length=50, unique=True)
-  address = models.OneToOneField(Address, on_delete=models.CASCADE)
-  # telphone = models.OneToOneField(Telephone, on_delete=models.CASCADE)

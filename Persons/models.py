@@ -1,10 +1,11 @@
 from django.db import models
 from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
 from Utils.models import Gender, Job, Title
+from polymorphic.models import PolymorphicModel 
 # Create your models here.
 
 
-class Person(BaseModel):
+class Person(PolymorphicModel, BaseModel):
   national_id = models.SmallIntegerField(unique=True)
   full_name = models.CharField(max_length=50, unique=True)
   family_name = models.CharField(max_length=10)
@@ -16,24 +17,24 @@ class Person(BaseModel):
       Gender, on_delete=models.CASCADE, related_name="persons"
   )
   Job = models.ForeignKey(Job, on_delete=models.SET_NULL, related_name="persons", null=True, blank=True)
-  title = models.ForeignKey(Title, on_delete=models.SET('Deleted'), related_name="persons", null=True, blank=True)
+  title = models.ForeignKey(Title, on_delete=models.SET('Deleted FK'), related_name="persons", null=True, blank=True)
   
 
-class Doctor():
+class Doctor(Person):
   pass
 
 
-class Patient():
+class Patient(Person):
   pass
 
 
-class Customer():
+class Customer(Person):
   pass
 
 
-class Employee():
+class Employee(Person):
   pass
 
 
-class User():
+class User(Person):
   pass

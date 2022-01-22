@@ -2,6 +2,7 @@ from django.db import models
 from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
 from djongo.models import ArrayField
 from Products.models import Product
+from Utils.models import Address
 
 # Create your models here.
 
@@ -88,5 +89,10 @@ class Kat(BaseModel):
 # class Telephone(BaseModelNative):
 #     pass
 
+
+class Branch(BaseModel):
+  name = models.CharField(max_length=50, unique=True)
+  address = models.OneToOneField(Address, on_delete=models.CASCADE)
+  # telphone = models.OneToOneField(Telephone, on_delete=models.CASCADE)
 
 #  🧕   🕌   🕋  👳  💲  🌍  👰‍♂️   👰‍♀️   👩‍❤️‍💋‍👩   🤰🏻   🏋️‍♀️   💒   👩‍❤️‍💋‍👨   🧑🏼‍🍼  👩‍🎓   🚣‍♀️  🤾‍♀️  👨‍💼   👷🏽‍♂️  👷🏼‍♀️   👨‍🔧   👨‍⚕  👩🏽‍⚕️  👨🏻‍🎓  👨🏼‍🏫  👩🏽‍🏫   🦷

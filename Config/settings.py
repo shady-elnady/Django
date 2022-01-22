@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     ## Libraries
+    'graphene_django',
+    'django_filters',
     'django_spaghetti',
     'polymorphic_tree',
     'polymorphic',
@@ -99,26 +101,26 @@ WSGI_APPLICATION = 'Config.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'djongo',
-        # 'NAME': 'djongo',
-        # 'ENFORCE_SCHEMA': False,
-        'CLIENT': {
-            'host': 'mongodb+srv://shadyelnady:ShN_0502910850@cluster0.bxjud.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
-            # 'port': port_number,
-            # 'username': 'db-username',
-            # 'password': 'password',
-            # 'authSource': 'db-name',
-            'name': 'nady_lab',
-            'authMechanism': 'SCRAM-SHA-1'
-        },
-        'LOGGING': {
-            'version': 1,
-            'loggers': {
-                'djongo': {
-                    'level': 'DEBUG',
-                    'propagate': False,                        
-                }
-            },
-            },
+        'NAME': 'djongo',
+        # # 'ENFORCE_SCHEMA': False,
+        # 'CLIENT': {
+        #     'host': 'mongodb+srv://shadyelnady:ShN_0502910850@cluster0.bxjud.mongodb.net/myFirstDatabase?retryWrites=true&w=majority',
+        #     # 'port': port_number,
+        #     # 'username': 'db-username',
+        #     # 'password': 'password',
+        #     # 'authSource': 'db-name',
+        #     'name': 'nady_lab',
+        #     'authMechanism': 'SCRAM-SHA-1'
+        # },
+        # 'LOGGING': {
+        #     'version': 1,
+        #     'loggers': {
+        #         'djongo': {
+        #             'level': 'DEBUG',
+        #             'propagate': False,                        
+        #         }
+        #     },
+        #     },
     }
 }
 # DATABASES = {
@@ -174,7 +176,7 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SPAGHETTI_SAUCE = {
-    'apps': ['auth', 'Persons'],
+    'apps': ['auth', 'Persons', 'Utils', 'Products', 'Nady_System', 'Libraries', 'GraphQL'],
     'show_fields': True,
     'exclude': {'auth': ['user']},
     'show_proxy':True,

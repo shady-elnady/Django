@@ -1,0 +1,9 @@
+[
+  {
+    "model": "Persons.category",
+    "pk": 1,
+    "fields": {
+      "name": "Dairy"
+    }
+  }
+]
