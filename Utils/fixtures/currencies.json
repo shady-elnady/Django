@@ -1,0 +1,145 @@
+[{
+        "model": "tools.Currency",
+        "name": "Dollar",
+        "fields": {
+            "native": "Dollar United States",
+            "code": "USD",
+            "emoji": "💲"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Rupee's India",
+        "fields": {
+            "native": "Rupee's India",
+            "code": "INR",
+            "emoji": "₹"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dollar's Taiwan",
+        "fields": {
+            "native": "",
+            "code": "TWD",
+            "emoji": "🇹🇼"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Euro",
+        "fields": {
+            "native": "Euro",
+            "code": "EUR",
+            "emoji": "💶 €"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Yen",
+        "fields": {
+            "native": "円",
+            "code": "JPY",
+            "emoji": "💴"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Lira's Turkey",
+        "fields": {
+            "native": "",
+            "code": "TRY",
+            "emoji": "₺"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Pound's Egypt",
+        "fields": {
+            "native": "جنيه مصرى",
+            "code": "EGP",
+            "emoji": "💷"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dinar's Jordan",
+        "fields": {
+            "native": "دينار أردنى",
+            "code": "JOD",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dinar's Kuwait",
+        "fields": {
+            "native": "دينار كويتى",
+            "code": "KWD",
+            "emoji": "🇰🇼"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dinar's Libya",
+        "fields": {
+            "native": "دينار ليبى",
+            "code": "LYD",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dinar's Tunisia",
+        "fields": {
+            "native": "دينار تونسى",
+            "code": "TND",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dinar's Iraq",
+        "fields": {
+            "native": "دينار عراقى",
+            "code": "IQD",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Riyal's Qatar",
+        "fields": {
+            "native": "ريال قطرى",
+            "code": "QAR",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Riyal's Saudi Arabia",
+        "fields": {
+            "native": "ريال سعودى",
+            "code": "SAR",
+            "emoji": "🇸🇦"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Riyal's Oman",
+        "fields": {
+            "native": "ريال عمانى",
+            "code": "OMR",
+            "emoji": "🏳️‍🌈"
+        }
+    },
+    {
+        "model": "tools.Currency",
+        "name": "Dirham",
+        "fields": {
+            "native": "درهم إمارتى",
+            "code": "AED",
+            "emoji": "🇦🇪"
+        }
+    }
+]

@@ -1,0 +1,112 @@
+[{
+        "model": "tools.Language",
+        "name": "English",
+        "fields": {
+            "native": "English",
+            "rtl": false,
+            "symbol": "en",
+            "active": true
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Arabic",
+        "fields": {
+            "native": "English",
+            "rtl": true,
+            "symbol": "en",
+            "active": true
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "French",
+        "fields": {
+            "native": "français",
+            "rtl": false,
+            "symbol": "fr",
+            "active": true
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Chuvash",
+        "fields": {
+            "native": "чӑваш чӗлхи",
+            "rtl": false,
+            "symbol": "cv",
+            "active": false
+        }
+    },
+
+    {
+        "model": "tools.Language",
+        "name": "German",
+        "fields": {
+            "native": "Deutsch",
+            "rtl": false,
+            "symbol": "de",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Italian",
+        "fields": {
+            "native": "Italiano",
+            "rtl": false,
+            "symbol": "it",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Kurdish",
+        "fields": {
+            "native": "Kurdî, کوردی",
+            "rtl": true,
+            "symbol": "ku",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Japanese",
+        "fields": {
+            "native": "日本語 (にほんご)",
+            "rtl": false,
+            "symbol": "ja",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Russian",
+        "fields": {
+            "native": "русский",
+            "rtl": false,
+            "symbol": "ru",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Spanish",
+        "fields": {
+            "native": "Española",
+            "rtl": false,
+            "symbol": "es",
+            "active": false
+        }
+    },
+    {
+        "model": "tools.Language",
+        "name": "Turkish",
+        "fields": {
+            "native": "Türkçe",
+            "rtl": false,
+            "symbol": "tr",
+            "active": false
+        }
+    }
+]

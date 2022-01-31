@@ -1,0 +1,17 @@
+[{
+        "model": "system.Senstivity",
+        "name": "Very Weak"
+    },
+    {
+        "model": "system.Senstivity",
+        "name": "Weak"
+    },
+    {
+        "model": "system.Senstivity",
+        "name": "Moderate"
+    },
+    {
+        "model": "system.Senstivity",
+        "name": "Strong"
+    }
+]

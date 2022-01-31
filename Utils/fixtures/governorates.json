@@ -1,0 +1,235 @@
+[{
+        "model": "tools.Governorate",
+        "name": "Cairo",
+        "fields": {
+            "native": "القاهره",
+            "tel_code": "02",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Alexandria",
+        "fields": {
+            "native": "الاسكندريه",
+            "tel_code": "03",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Dakahlia",
+        "fields": {
+            "native": "الدقهليه",
+            "tel_code": "050",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Aswan",
+        "fields": {
+            "native": "أسوان",
+            "tel_code": "097",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Arish",
+        "fields": {
+            "native": "العريش",
+            "tel_code": "068",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Beni Suef",
+        "fields": {
+            "native": "بنى سويف",
+            "tel_code": "082",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Damietta",
+        "fields": {
+            "native": "دمياط",
+            "tel_code": "057",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Ismailia",
+        "fields": {
+            "native": "اسماعليه",
+            "tel_code": "064",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Luxor",
+        "fields": {
+            "native": "الاقصر",
+            "tel_code": "095",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Monufia",
+        "fields": {
+            "native": "منوفيه",
+            "tel_code": "048",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Port Said",
+        "fields": {
+            "native": "بورسعيد",
+            "tel_code": "066",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Red Sea",
+        "fields": {
+            "native": "البحرالاحمر",
+            "tel_code": "065",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Suez",
+        "fields": {
+            "native": "سويس",
+            "tel_code": "062",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "El Tour",
+        "fields": {
+            "native": "الطور",
+            "tel_code": "069",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "10th of Ramadan",
+        "fields": {
+            "native": "العاشر من رمضان",
+            "tel_code": "055",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Asyut",
+        "fields": {
+            "native": "أسيوط",
+            "tel_code": "088",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Damanhur",
+        "fields": {
+            "native": "دمنهور",
+            "tel_code": "04",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Faiyum",
+        "fields": {
+            "native": "فيوم",
+            "tel_code": "048",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Kafr El Sheikh",
+        "fields": {
+            "native": "كفرالشيخ",
+            "tel_code": "047",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Marsa Matruh",
+        "fields": {
+            "native": "مرسى مطروح",
+            "tel_code": "046",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Minya",
+        "fields": {
+            "native": "منيا",
+            "tel_code": "086",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "New Valley",
+        "fields": {
+            "native": "الوادى الجديد",
+            "tel_code": "092",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Sohag",
+        "fields": {
+            "native": "سوهاج",
+            "tel_code": "093",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Qena",
+        "fields": {
+            "native": "قنا",
+            "tel_code": "096",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Tanta",
+        "fields": {
+            "native": "طنطا",
+            "tel_code": "040",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "tools.Governorate",
+        "name": "Qalyubia",
+        "fields": {
+            "native": "قليوبيه",
+            "tel_code": "013",
+            "country": "Egypt"
+        }
+    }
+]

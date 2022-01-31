@@ -23,6 +23,10 @@ pip3 install dnspython
 pip3 install graphene-django
 pip3 install django-filter
 pip3 install django-graphql-jwt
+pip3 install django-import-export
+pip3 install django-debug-toolbar
+pip3 install graphene-file-upload
+pip3 install graphene-django-optimizer
 
 # Commands
 python3 manage.py makemigrations

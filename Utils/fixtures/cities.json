@@ -1,0 +1,33 @@
+[{
+        "model": "tools.City",
+        "name": "Mansoura",
+        "fields": {
+            "native": "المنصوره",
+            "governorate": "Dakahlia"
+        }
+    },
+    {
+        "model": "tools.City",
+        "name": "Sherbin",
+        "fields": {
+            "native": "شربين",
+            "governorate": "Dakahlia"
+        }
+    },
+    {
+        "model": "tools.City",
+        "name": "Belqas",
+        "fields": {
+            "native": "بلقاس",
+            "governorate": "Dakahlia"
+        }
+    },
+    {
+        "model": "tools.City",
+        "name": "Talkha",
+        "fields": {
+            "native": "طلخا",
+            "governorate": "Dakahlia"
+        }
+    }
+]

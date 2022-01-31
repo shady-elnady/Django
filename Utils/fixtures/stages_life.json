@@ -1,0 +1,57 @@
+[{
+        "model": "tools.StageLife",
+        "name": "Infant",
+        "fields": {
+            "from_age": 0,
+            "to_age": 1
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Toddler",
+        "fields": {
+            "from_age": 2,
+            "to_age": 4
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Child",
+        "fields": {
+            "from_age": 5,
+            "to_age": 12
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Teen",
+        "fields": {
+            "from_age": 13,
+            "to_age": 19
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Adult",
+        "fields": {
+            "from_age": 20,
+            "to_age": 39
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Middle Age",
+        "fields": {
+            "from_age": 40,
+            "to_age": 59
+        }
+    },
+    {
+        "model": "tools.StageLife",
+        "name": "Senior Adult",
+        "fields": {
+            "from_age": 60,
+            "to_age": 120
+        }
+    }
+]

@@ -1,0 +1,33 @@
+[{
+        "model": "tools.MobileCompany",
+        "name": "Vodafone",
+        "fields": {
+            "code": "10",
+            "emoji": ":vodafone:"
+        }
+    },
+    {
+        "model": "tools.MobileCompany",
+        "name": "Etisalat",
+        "fields": {
+            "code": "11",
+            "emoji": ":etisalat:"
+        }
+    },
+    {
+        "model": "tools.MobileCompany",
+        "name": "Orange",
+        "fields": {
+            "code": "12",
+            "emoji": ":orange:"
+        }
+    },
+    {
+        "model": "tools.MobileCompany",
+        "name": "We",
+        "fields": {
+            "code": "15",
+            "emoji": ":we:"
+        }
+    }
+]

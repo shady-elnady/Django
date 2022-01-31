@@ -23,6 +23,21 @@ class BaseModelName(models.Model):
 
 class BaseModelNative(BaseModelName):
   native = models.CharField(max_length=20, unique=True, null=True, blank=True)
+  
+  class Meta:
+    abstract = True
+    
+    
+class BaseModelEmoji(BaseModelName):
+  emoji = models.CharField(max_length=5, unique=True, null=True, blank=True)
+  
+  class Meta:
+    abstract = True
+    
+    
+class BaseModelLogo(BaseModelName):
+  logo_url = models.CharField(max_length=100, unique=True, null=True, blank=True)
+  
   class Meta:
     abstract = True
     

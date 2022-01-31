@@ -1,0 +1,53 @@
+[{
+        "model": "tools.unit",
+        "name": 1,
+        "fields": {
+            "name": "millgram",
+            "shortcut": "mg"
+        }
+    },
+    {
+        "model": "tools.unit",
+        "name": 2,
+        "fields": {
+            "name": "millmoll",
+            "shortcut": "mmol"
+        }
+    },
+    {
+        "model": "tools.sample",
+        "name": 1,
+        "fields": {
+            "name": "Serum",
+            "volume": 1,
+            "unit": 1
+        }
+    },
+    {
+        "model": "tools.sample",
+        "name": 2,
+        "fields": {
+            "name": "Urine",
+            "volume": 10,
+            "unit": 2
+        }
+    },
+    {
+        "model": "tools.sample",
+        "name": 3,
+        "fields": {
+            "name": "Bood",
+            "volume": 2,
+            "unit": 1
+        }
+    },
+    {
+        "model": "tools.sample",
+        "name": 4,
+        "fields": {
+            "name": "CSF",
+            "volume": 5,
+            "unit": 2
+        }
+    }
+]

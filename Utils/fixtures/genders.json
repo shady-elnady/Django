@@ -1,0 +1,49 @@
+[{
+        "model": "tools.Gender",
+        "name": "Male",
+        "fields": {
+            "emoji": "🤵‍♀️",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.Gender",
+        "name": "FeMale",
+        "fields": {
+            "emoji": " 👰‍♀️",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.Gender",
+        "name": "Neuter",
+        "fields": {
+            "emoji": "⚲",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.Gender",
+        "name": "Hermaphrodite",
+        "fields": {
+            "emoji": "⚦",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.Gender",
+        "name": "Intersex",
+        "fields": {
+            "emoji": "⚩",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.Gender",
+        "name": "TranGender",
+        "fields": {
+            "emoji": " ⚨",
+            "is_active": false
+        }
+    }
+]

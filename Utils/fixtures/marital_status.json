@@ -1,0 +1,73 @@
+[{
+        "model": "tools.MaritalStatus",
+        "name": "Virgin",
+        "fields": {
+            "emoji": "💐",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Engaged",
+        "fields": {
+            "emoji": "💍",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Marriage",
+        "fields": {
+            "emoji": "⚭ 👩‍❤‍👨",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Divorced",
+        "fields": {
+            "emoji": "⚮",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Widower",
+        "fields": {
+            "emoji": "⚰️",
+            "is_active": true
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Gay",
+        "fields": {
+            "emoji": "⚣",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "Lesbian",
+        "fields": {
+            "emoji": "⚢",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "InterCourse",
+        "fields": {
+            "emoji": "⚥",
+            "is_active": false
+        }
+    },
+    {
+        "model": "tools.MaritalStatus",
+        "name": "TranSexual",
+        "fields": {
+            "emoji": "⚧",
+            "is_active": false
+        }
+    }
+]

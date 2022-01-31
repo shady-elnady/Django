@@ -1,0 +1,91 @@
+[{
+        "model": "products.PharmacologicalForm",
+        "name": "Oral",
+        "fields": {
+            "dosage_form": [
+                "Pill",
+                "Tablet",
+                "Capsule",
+                "Syrups",
+                "Buccal",
+                "Sublingual",
+                "Orally Disintegrating",
+                "Thin Film",
+                "Liquid Solution",
+                "Suspension",
+                "Powder",
+                "Liquid",
+                "Solid Crystals",
+                "Pastes"
+            ]
+        }
+    },
+    {
+        "model": "products.PharmacologicalForm",
+        "name": "Ophthalmic",
+        "fields": {
+            "dosage_form": [
+                "Eye drops",
+                "Eye lotions",
+                "Ophthalmic Suspensions",
+                "Ophthalmic Ointments",
+                "Ophthalmic Emulsions"
+            ]
+        }
+    },
+    {
+        "model": "products.PharmacologicalForm",
+        "name": "Inhalation",
+        "fields": {
+            "dosage_form": ["Aerosol", "Inhaler", "Nebulizer", "Smoking", "Vaporizer"]
+        }
+    },
+    {
+        "model": "products.PharmacologicalForm",
+        "name": "Parenteral (Injection)",
+        "fields": {
+            "dosage_form": [
+                "Intradermal (ID)",
+                "Subcutaneous (SC)",
+                "Intramuscular (IM)",
+                "Intraosseous (IO)",
+                "Intraperitoneal (IP)",
+                "Intravenous (IV)"
+            ]
+        }
+    },
+    {
+        "model": "products.PharmacologicalForm",
+        "name": "Topical",
+        "fields": {
+            "dosage_form": [
+                "Cream",
+                "gel",
+                "liniment",
+                "balm",
+                "lotion",
+                "ointment",
+                "Ear drops (otic)",
+                "Eye drops (ophthalmic)",
+                "Skin patch (transdermal)",
+                "Dermal patch",
+                "Powder//Talc"
+            ]
+        }
+    },
+    {
+        "model": "products.PharmacologicalForm",
+        "name": "Suppository",
+        "fields": {
+            "dosage_form": [
+                "Intravaginal",
+                "Vaginal rings",
+                "Rectal",
+                "Urethral",
+                "Nasal"
+            ]
+        }
+    }
+]
+
+// https://en.wikipedia.org/wiki/Dosage_form

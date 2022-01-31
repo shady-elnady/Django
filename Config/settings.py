@@ -12,6 +12,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 
 from pathlib import Path
 from decouple import config
+from datetime import timedelta
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -27,8 +28,11 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", cast=bool)
 
 
-ALLOWED_HOSTS = []
+AUTH_USER_MODEL = "Persons.User"
 
+ALLOWED_HOSTS = [
+    '127.0.0.1',
+]
 
 # Application definition
 
@@ -46,6 +50,7 @@ INSTALLED_APPS = [
     'polymorphic_tree',
     'polymorphic',
     'mptt',
+    'import_export',
     ## My Apps
     'GraphQL',
     'Libraries',
@@ -53,6 +58,11 @@ INSTALLED_APPS = [
     'Persons',
     'Products',
     'Nady_System',
+    'Doctors',
+    'Social',
+    'Finances',  # ماليات
+    'Facilities',  # منشآت
+    'Articles',
 ]
 
 MIDDLEWARE = [
@@ -176,8 +186,38 @@ MEDIA_ROOT = BASE_DIR / 'media'
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 SPAGHETTI_SAUCE = {
-    'apps': ['auth', 'Persons', 'Utils', 'Products', 'Nady_System', 'Libraries', 'GraphQL'],
+    'apps': [
+        'auth', 'Persons', 'Utils', 'Products',
+        'Nady_System', 'Libraries', 'GraphQL',
+        'Doctors', 'Facilities', 'Social',
+        'Finances', 'Facilities', 'Articles',
+    ],
     'show_fields': True,
     'exclude': {'auth': ['user']},
     'show_proxy':True,
+}
+
+# It determines if the library will use database transactions on data import
+IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+
+# Graphene settings
+GRAPHENE = {
+    "SCHEMA": "GraphQL.schema.schema",
+    "MIDDLEWARE": (
+        "graphql_jwt.middleware.JSONWebTokenMiddleware",
+        "graphene_django.debug.DjangoDebugMiddleware",
+    ),
+    "SCHEMA_OUTPUT": "schema.graphql",
+    "SCHEMA_INDENT": 2,
+}
+
+AUTHENTICATION_BACKENDS = [
+    "graphql_jwt.backends.JSONWebTokenBackend",
+    "django.contrib.auth.backends.ModelBackend",
+]
+
+GRAPHQL_JWT = {
+    "JWT_VERIFY_EXPIRATION": True,
+    "JWT_EXPIRATION_DELTA": timedelta(days=1),
 }
