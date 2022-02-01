@@ -1,8 +1,10 @@
+from Facilities.models import Branch
 from Persons.managers import FollowingManager, UsersManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
 from djongo.models import ArrayReferenceField
 from GraphQL.models import BaseModel, BaseModelName
+
 # from Nady_System.models import BloodGroup
 from polymorphic.models import PolymorphicModel
 import calendar
@@ -32,13 +34,20 @@ class Gender(BaseModelName):
 
 class Title(BaseModelName):
     stage_life = models.ForeignKey(
-        StageLife, related_name="titles", on_delete=models.CASCADE,
+        StageLife,
+        related_name="titles",
+        on_delete=models.CASCADE,
     )
     gender = models.ForeignKey(
-        Gender, related_name="titles", on_delete=models.CASCADE,
+        Gender,
+        related_name="titles",
+        on_delete=models.CASCADE,
     )
     job = models.ForeignKey(
-        Job, related_name="titles", null=True, on_delete=models.CASCADE,
+        Job,
+        related_name="titles",
+        null=True,
+        on_delete=models.CASCADE,
     )
 
     class Meta:
@@ -55,12 +64,12 @@ def age_calculate(born):
     if today.month >= born.month:
         year = today.year
     else:
-        year = today.year-1
+        year = today.year - 1
     age_years = year - born.year
     try:  # raised when birth day is February 29 and the current year is not a leap year
         age_days = (today - (born.replace(year=year))).days
     except ValueError:
-        age_days = (today - (born.replace(year=year, day=born.day-1))).days + 1
+        age_days = (today - (born.replace(year=year, day=born.day - 1))).days + 1
     month = born.month
     age_months = 0
     while age_days > calendar.monthrange(year, month)[1]:
@@ -74,22 +83,34 @@ def age_calculate(born):
     return f"{age_years} {age_months} {age_days}"
 
 
-class Person(PolymorphicModel, BaseModel,  AbstractBaseUser, PermissionsMixin):
+class Person(PolymorphicModel, BaseModel, AbstractBaseUser, PermissionsMixin):
 
     national_id = models.CharField(
-        max_length=14, unique=True, blank=True, null=True,
+        max_length=14,
+        unique=True,
+        blank=True,
+        null=True,
     )
     full_name = models.CharField(max_length=80, unique=True)
     family_name = models.CharField(max_length=15)
     birth_date = models.DateField()
     image_url = models.ImageField(
-        upload_to="images", editable=True, null=True, blank=True,
+        upload_to="images",
+        editable=True,
+        null=True,
+        blank=True,
     )
     gender = models.ForeignKey(
-        Gender, on_delete=models.CASCADE, related_name="persons",
+        Gender,
+        on_delete=models.CASCADE,
+        related_name="persons",
     )
     Job = models.ForeignKey(
-        Job, on_delete=models.SET_NULL, related_name="persons", null=True, blank=True,
+        Job,
+        on_delete=models.SET_NULL,
+        related_name="persons",
+        null=True,
+        blank=True,
     )
 
     # TODO
@@ -97,10 +118,15 @@ class Person(PolymorphicModel, BaseModel,  AbstractBaseUser, PermissionsMixin):
     #     'Deleted FK'), related_name="persons", null=True, blank=True,
     # )
     kinshipers = models.ManyToManyField(
-        'self', through='Kinship', symmetrical=True,
+        "self",
+        through="Kinship",
+        symmetrical=True,
     )
     email = models.EmailField(
-        max_length=200, unique=True, null=False, blank=False,
+        max_length=200,
+        unique=True,
+        null=False,
+        blank=False,
     )
 
     @property
@@ -112,18 +138,22 @@ class Person(PolymorphicModel, BaseModel,  AbstractBaseUser, PermissionsMixin):
 
 
 class Kinship(models.Model):
-
     class kinshipRelations(models.TextChoices):
-        a = 'a'
+        a = "a"
 
     person = models.ForeignKey(
-        Person, on_delete=models.CASCADE, related_name='person',
+        Person,
+        on_delete=models.CASCADE,
+        related_name="person",
     )
     kinshiper = models.ForeignKey(
-        Person, on_delete=models.CASCADE, related_name='kinshiper',
+        Person,
+        on_delete=models.CASCADE,
+        related_name="kinshiper",
     )
     Relation = models.CharField(
-        max_length=20, choices=kinshipRelations.choices,
+        max_length=20,
+        choices=kinshipRelations.choices,
     )
 
     class Meta:
@@ -137,13 +167,12 @@ class Pharmaceutical(Person):
     pass
 
 
-class Pharmacist(Person): # صيدلي
-  pass
-
+class Pharmacist(Person):  # صيدلي
+    pass
 
 
 class Customer(Person):
-  pass
+    pass
 
 
 class Patient(Person):
@@ -153,20 +182,8 @@ class Patient(Person):
     # )
 
 
-class Work(BaseModelName):
-    pass
-    # Admin = 'Admin'
-    # Reciption = 'Reciption'
-    # Nurse = 'Nurse'
-    # Spicialiste = 'Spicialiste'
-    # Representative = 'Representative'
-
-
-class TeamEmployee(Person):
-    works = ArrayReferenceField(
-        to=Work,
-        on_delete=models.CASCADE,
-    )
+class Employee(Person):
+    branch = models.ForeignKey(Branch, on_delete=models.CASCAD)
 
 
 class User(Person):
@@ -176,7 +193,10 @@ class User(Person):
     objects = UsersManager()
 
     username = models.CharField(
-        max_length=30, unique=True, null=False, blank=False,
+        max_length=30,
+        unique=True,
+        null=False,
+        blank=False,
     )
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
@@ -198,5 +218,3 @@ class Following(BaseModel):
         )
 
     objects = FollowingManager()
-
-
