@@ -1,4 +1,5 @@
 from Facilities.models import Branch
+from Languages.models import Language
 from Persons.managers import FollowingManager, UsersManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models
@@ -23,10 +24,24 @@ class MaritalStatus(BaseModelName):
     is_active = models.BooleanField(default=False)
 
 
-class Job(BaseModelName):
+class Department(PolymorphicModel, BaseModelName):
     pass
 
 
+class Job(PolymorphicModel, BaseModelName):
+    pass
+
+
+# TODO Lab
+class LabDepartment(Department):
+    pass
+
+
+class LabJob(Job):
+    department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
+
+
+###################################
 class Gender(BaseModelName):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
@@ -58,32 +73,7 @@ class Title(BaseModelName):
         )
 
 
-def age_calculate(born):
-    calendar.setfirstweekday(calendar.SUNDAY)
-    today = date.today()
-    if today.month >= born.month:
-        year = today.year
-    else:
-        year = today.year - 1
-    age_years = year - born.year
-    try:  # raised when birth day is February 29 and the current year is not a leap year
-        age_days = (today - (born.replace(year=year))).days
-    except ValueError:
-        age_days = (today - (born.replace(year=year, day=born.day - 1))).days + 1
-    month = born.month
-    age_months = 0
-    while age_days > calendar.monthrange(year, month)[1]:
-        age_days = age_days - calendar.monthrange(year, month)[1]
-        if month == 12:
-            month = 1
-            year += 1
-        else:
-            month += 1
-        age_months += 1
-    return f"{age_years} {age_months} {age_days}"
-
-
-class Person(PolymorphicModel, BaseModel, AbstractBaseUser, PermissionsMixin):
+class Person(PolymorphicModel, BaseModel):
 
     national_id = models.CharField(
         max_length=14,
@@ -127,11 +117,33 @@ class Person(PolymorphicModel, BaseModel, AbstractBaseUser, PermissionsMixin):
         unique=True,
         null=False,
         blank=False,
-    )
+    )  # TODO E-mail
 
     @property
     def age(self):
-        return age_calculate(self.birth_date)
+        born = self.birth_date
+        calendar.setfirstweekday(calendar.SUNDAY)
+        today = date.today()
+        if today.month >= born.month:
+            year = today.year
+        else:
+            year = today.year - 1
+        age_years = year - born.year
+        try:  # raised when birth day is February 29 and the current year is not a leap year
+            age_days = (today - (born.replace(year=year))).days
+        except ValueError:
+            age_days = (today - (born.replace(year=year, day=born.day - 1))).days + 1
+        month = born.month
+        age_months = 0
+        while age_days > calendar.monthrange(year, month)[1]:
+            age_days = age_days - calendar.monthrange(year, month)[1]
+            if month == 12:
+                month = 1
+                year += 1
+            else:
+                month += 1
+            age_months += 1
+        return f"{age_years} {age_months} {age_days}"
 
     def __str__(self) -> str:
         return self.full_name
@@ -163,12 +175,12 @@ class Kinship(models.Model):
         )
 
 
-class Pharmaceutical(Person):
-    pass
+# class Pharmaceutical(Person):
+#     pass
 
 
-class Pharmacist(Person):  # صيدلي
-    pass
+# class Pharmacist(Person):  # صيدلي
+#     pass
 
 
 class Customer(Person):
@@ -182,11 +194,23 @@ class Patient(Person):
     # )
 
 
+# TODO Permission class Bind to MIXIN
+class Permission(BaseModelName):
+    pass
+
+
 class Employee(Person):
     branch = models.ForeignKey(Branch, on_delete=models.CASCAD)
+    salary = models.DecimalField(max_digits=5, decimal_places=2)
+    attendance_time = models.TimeField()  # ميعاد الحضور
+    check_out_time = models.TimeField()  # ميعاد الانصراف
+    permissions = ArrayReferenceField(
+        to=Permission,
+        on_delete=models.CASCADE,
+    )
 
 
-class User(Person):
+class User(Person, AbstractBaseUser, PermissionsMixin):
     USERNAME_FIELD = "username"
     REQUIRED_FIELDS = ["email"]
 
@@ -199,6 +223,9 @@ class User(Person):
         blank=False,
     )
     is_active = models.BooleanField(default=True)
+    language = models.ForeignKey(
+        Language, on_delete=models.SET_NULL, null=True, blank=True
+    )
     is_staff = models.BooleanField(default=False)
     # is_superuser = models.BooleanField(default=False)
 
@@ -218,3 +245,34 @@ class Following(BaseModel):
         )
 
     objects = FollowingManager()
+
+
+# TODO Employee Attendance Management System
+## https://itsourcecode.com/uml/employee-attendance-management-system-er-diagram-erd/
+
+
+class Work(BaseModelName):
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+
+
+class Duty(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    duration = models.DurationField()
+    _date = models.DateField()
+
+
+class Leave(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    _date = models.DateField()
+
+
+class Attendance(models.Model):
+    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
+    work = models.ForeignKey(Work, on_delete=models.CASCADE)
+    duty = models.ForeignKey(Duty, on_delete=models.CASCADE)
+    total_labor = models.DecimalField(max_digits=5, decimal_places=2)
+    salary = models.DecimalField(max_digits=5, decimal_places=2)
+    _date = models.DateField()

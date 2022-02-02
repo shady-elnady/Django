@@ -1,27 +1,15 @@
 from django.db import models
-from Facilities.models import Facility, MainLab, Store
-from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
+from Facilities.models import Facility
+from GraphQL.models import BaseModel, BaseModelName
 from djongo.models import ArrayReferenceField
 from Persons.models import Employee
-from Products.models import Product
+from Products.models import LineInInvoice, Product
 
 # Create your models here.
 
-# TODO
-class LabWork(BaseModelName):
-    pass
-    # Admin = 'Admin'
-    # Reciption = 'Reciption'
-    # Nurse = 'Nurse'
-    # Spicialiste = 'Spicialiste'
-    # Representative = 'Representative'
-
 
 class LabEmployee(Employee):
-    works = ArrayReferenceField(
-        to=LabWork,
-        on_delete=models.CASCADE,
-    )
+    pass
 
 
 # TODO
@@ -38,29 +26,30 @@ class Lab(Laboratory):
 
 
 # TODO
-class ItemDetail(BaseModel):
-    quantity = models.DecimalField(max_digits=3, decimal_places=2)
-    expire_date = models.DateField()
-
-
 class Stock(BaseModel):  # المخزون
-    item = models.OneToOneField(Product, on_delete=models.CASCADE)
-    details = models.ManyToManyField(
-        ItemDetail,
+    product = models.OneToOneField(Product, on_delete=models.CASCADE)
+    details = ArrayReferenceField(
+        to=LineInInvoice,
         on_delete=models.CASCADE,
     )
 
+    @property
+    def packing(self):
+        return self.product.packing
 
-# TODO
+    @property
+    def stock(self) -> float:  # inventory  المخزون
+        return sum(list(map(lambda x: x["count_packing"], self.details)))
+
+
+# TODO Duration Sample
 class Sample(BaseModelName):
     Comment = models.TextField(max_length=200)
+    time = models.TimeField(blank=True, null=True)
+    duration = models.DurationField(blank=True, null=True)
 
 
 class TechniqueMethod(BaseModelName):
-    pass
-
-
-class Kat(Product):
     pass
 
 
@@ -71,6 +60,27 @@ class MedicalSupplies(Product):
 class Analyzer(Product):
     brochu_url = models.CharField(max_length=50, null=True, blank=True)
     test_volume = models.DecimalField(max_digits=2, decimal_places=2)
+
+
+class Kat(Product):
+    technique_method = models.ManyToManyField(
+        TechniqueMethod,
+        through="KatTechniqueMethod",
+        symmetrical=False,
+    )
+
+
+class KatTechniqueMethod(models.Model):
+    kat = models.ForeignKey(Kat, on_delete=models.CASCADE)
+    technique_method = models.ForeignKey(TechniqueMethod, on_delete=models.CASCADE)
+    analyzer = models.ManyToManyField(
+        Analyzer,
+        through="AnalyzerKatTechniqueMethod",
+        symmetrical=False,
+    )
+
+    class Meta:
+        unique_together = [["kat", "technique_method"]]
 
 
 # NOTE Bind with Medicin
@@ -101,6 +111,9 @@ class UnitConvert(models.Model):
     )
     factor = models.DecimalField(max_digits=5, decimal_places=4)
 
+    def __str__(self) -> str:
+        return f"{self.from_unit} -> {self.to_unit}"
+
     class Meta:
         unique_together = [["from_unit", "to_unit"]]
 
@@ -110,10 +123,6 @@ class ShortCutParameter(BaseModelName):
 
 
 class Parameter(BaseModelName):
-    shortcuts = ArrayReferenceField(
-        to=ShortCutParameter,
-        on_delete=models.CASCADE,
-    )
     samples = models.ManyToManyField(
         Sample,
         through="SampleParameter",
@@ -167,6 +176,20 @@ class ParameterUnitConvert(models.Model):
         return f"{self.from_parameter_unit} -> {self.to_parameter_unit}"
 
 
+class AnalyzerKatTechniqueMethod(models.Model):
+    analyzer = models.ForeignKey(
+        Analyzer,
+        on_delete=models.CASCADE,
+    )
+    kat_technique_method = models.ForeignKey(
+        KatTechniqueMethod,
+        on_delete=models.CASCADE,
+    )
+
+    class Meta:
+        unique_together = [["analyzer", "kat_technique_method"]]
+
+
 class SampleParameter(models.Model):
     parameter = models.ForeignKey(
         Parameter,
@@ -178,22 +201,15 @@ class SampleParameter(models.Model):
         null=True,
         blank=True,
     )
+    shortcuts = ArrayReferenceField(
+        to=ShortCutParameter,
+        on_delete=models.CASCADE,
+    )
 
-    # analyzer = models.ManyToManyField(
-    #     Analyzer,
-    #     through="Analysis",
-    #     symmetrical=False,
-    # )
-    # kat = models.ManyToManyField(
-    #     Kat,
-    #     through="kat",
-    #     symmetrical=False,
-    # )
-    # technique_method = models.ManyToManyField(
-    #     TechniqueMethod,
-    #     through="Analysis",
-    #     symmetrical=False,
-    # )
+    analyzer_kat_technique_method = models.ManyToManyField(
+        AnalyzerKatTechniqueMethod,
+        through="Analysis",
+    )
 
     # NOTE
     # is_default = models.BooleanField(default=True)
@@ -211,18 +227,11 @@ class Analysis(BaseModelName):
         SampleParameter,
         on_delete=models.CASCADE,
     )
-    analyzer = models.ForeignKey(
-        Analyzer,
+    analyzer_kat_technique_method = models.ForeignKey(
+        AnalyzerKatTechniqueMethod,
         on_delete=models.CASCADE,
     )
-    technique_method = models.ForeignKey(
-        TechniqueMethod,
-        on_delete=models.CASCADE,
-    )
-    kat = models.ForeignKey(
-        Kat,
-        on_delete=models.CASCADE,
-    )
+
     price_ptient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
@@ -250,9 +259,7 @@ class Analysis(BaseModelName):
         unique_together = [
             [
                 "sample_parameter",
-                "analyzer",
-                "technique_method",
-                "kat",
+                "analyzer_kat_technique_method",
             ]
         ]
 
