@@ -1,18 +1,26 @@
 from django.db import models
-from Facilities.models import Facility
+from Facilities.models import Department, Facility
 from GraphQL.models import BaseModel, BaseModelName
 from djongo.models import ArrayReferenceField
-from Persons.models import Employee
+from polymorphic.models import PolymorphicModel
+
+from Persons.models import Employee, Job
 from Products.models import LineInInvoice, Product
+
 
 # Create your models here.
 
 
-class LabEmployee(Employee):
+# class Product:
+#     PUBLISHED = 1
+
+#     objects = ProductManager()
+
+
+class NREntity(PolymorphicModel):
     pass
 
 
-# TODO
 class Laboratory(Facility):
     pass
 
@@ -22,6 +30,18 @@ class MainLab(Laboratory):
 
 
 class Lab(Laboratory):
+    pass
+
+
+class LabDepartment(Department):
+    pass
+
+
+class LabJob(Job):
+    department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
+
+
+class LabEmployee(Employee):
     pass
 
 
@@ -37,8 +57,8 @@ class Stock(BaseModel):  # المخزون
     def packing(self):
         return self.product.packing
 
-    @property
-    def stock(self) -> float:  # inventory  المخزون
+    @property  # inventory  المخزون
+    def stock(self):
         return sum(list(map(lambda x: x["count_packing"], self.details)))
 
 
@@ -201,19 +221,11 @@ class SampleParameter(models.Model):
         null=True,
         blank=True,
     )
-    shortcuts = ArrayReferenceField(
-        to=ShortCutParameter,
-        on_delete=models.CASCADE,
-    )
 
     analyzer_kat_technique_method = models.ManyToManyField(
         AnalyzerKatTechniqueMethod,
         through="Analysis",
     )
-
-    # NOTE
-    # is_default = models.BooleanField(default=True)
-    # is_available = models.BooleanField(default=True)
 
     class Meta:
         unique_together = [["parameter", "sample"]]
@@ -222,7 +234,11 @@ class SampleParameter(models.Model):
         return f"{self.sample}_{self.parameter}"
 
 
-class Analysis(BaseModelName):
+class Analysis(models.Model):
+    shortcuts = ArrayReferenceField(
+        to=ShortCutParameter,
+        on_delete=models.CASCADE,
+    )
     sample_parameter = models.ForeignKey(
         SampleParameter,
         on_delete=models.CASCADE,
@@ -231,26 +247,27 @@ class Analysis(BaseModelName):
         AnalyzerKatTechniqueMethod,
         on_delete=models.CASCADE,
     )
-
-    price_ptient = models.DecimalField(
+    is_default = models.BooleanField(default=True)
+    is_available = models.BooleanField(default=True)
+    price_patient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
     )
-    price_lab_2_we = models.DecimalField(
+    price_lab = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
     )
-    my_lab_2_lab = models.ManyToManyField(
+    lab_2_lab = models.ManyToManyField(
         MainLab,
         through="MainLabMenu",
     )
-    normal_range = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+    # TODO Normal Range
+    normal_range = models.ManyToManyField(
+        NREntity,
         null=True,
         blank=True,
     )
@@ -280,20 +297,20 @@ class MainLabMenu(models.Model):
 
     analysis = models.ForeignKey(Analysis, on_delete=models.CASCADE)
     laboratory = models.ForeignKey(MainLab, on_delete=models.CASCADE)
-    price = models.DecimalField(
+    cost = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
-    )
+    )  # التكلفه
     run_time = models.CharField(max_length=20, choices=RunTime.choices)
-    normal_range = models.DecimalField(
-        max_digits=5,
-        decimal_places=2,
+    # TODO Normal Range
+    normal_range = models.ManyToManyField(
+        NREntity,
         null=True,
         blank=True,
     )
-    default = models.BooleanField(default=True)
+    is_default = models.BooleanField(default=True)
 
     class Meta:
         unique_together = [

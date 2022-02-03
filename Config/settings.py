@@ -55,13 +55,15 @@ INSTALLED_APPS = [
     "GraphQL",
     "Libraries",
     "Utils",
-    "Persons",
-    "Products",
-    "Nady_System",
-    "Doctors",
-    "Social",
+    "Location",
+    "Languages",
     "Finances",  # ماليات
     "Facilities",  # منشآت
+    "Products",
+    "Persons",
+    "Doctors",
+    "Nady_System",
+    "Social",
     "Articles",
 ]
 
@@ -200,6 +202,8 @@ SPAGHETTI_SAUCE = {
         "Finances",
         "Facilities",
         "Articles",
+        "Languages",
+        "Location",
     ],
     "show_fields": True,
     "exclude": {"auth": ["user"]},

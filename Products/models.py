@@ -3,7 +3,8 @@ from Facilities.models import Compony
 from GraphQL.models import BaseModel, BaseModelName
 from polymorphic.models import PolymorphicModel
 from Location.models import Country
-from Nady_System.models import Unit
+
+# from Nady_System.models import Unit
 from Persons.models import Customer, Employee
 from djongo.models import ArrayReferenceField
 
@@ -40,7 +41,7 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
     category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     default_packing = models.CharField(max_length=10, choices=Packing.choices)
     package_size = models.DecimalField(max_digits=4, decimal_places=2)
-    measurment_unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
+    measurment_unit = models.ForeignKey(to="Nady_System.Unit", on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (

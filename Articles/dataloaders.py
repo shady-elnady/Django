@@ -1,7 +1,7 @@
-from articles.models import Article, FavoriteArticles
+from .models import Article, FavoriteArticles
 from django.db.models import Count, Exists, OuterRef
 from promise.dataloader import DataLoader, Promise
-from users.models import User
+from Persons.models import User
 
 
 class ArticleFavoriteDataLoader(DataLoader):

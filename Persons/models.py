@@ -1,8 +1,10 @@
-from Facilities.models import Branch
+# from Facilities.models import Branch, Department
 from Languages.models import Language
+from Nady_System.models import NREntity
 from Persons.managers import FollowingManager, UsersManager
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
-from django.db import models
+from django.db import models  # from django.db.models import Model, ForeignKey, CASCADE
+
 from djongo.models import ArrayReferenceField
 from GraphQL.models import BaseModel, BaseModelName
 
@@ -11,12 +13,16 @@ from polymorphic.models import PolymorphicModel
 import calendar
 from datetime import date
 
+# from django.apps import apps
+# MyModel = apps.get_model('myapp', 'MyModel')
+
+
 # Create your models here.
 
 
-class StageLife(BaseModelName):
-    from_age = models.SmallIntegerField()
-    to_age = models.SmallIntegerField()
+class StageLife(NREntity, BaseModelName):
+    from_age = models.DurationField()
+    to_age = models.DurationField()
 
 
 class MaritalStatus(BaseModelName):
@@ -24,25 +30,12 @@ class MaritalStatus(BaseModelName):
     is_active = models.BooleanField(default=False)
 
 
-class Department(PolymorphicModel, BaseModelName):
-    pass
-
-
 class Job(PolymorphicModel, BaseModelName):
     pass
 
 
-# TODO Lab
-class LabDepartment(Department):
-    pass
-
-
-class LabJob(Job):
-    department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
-
-
 ###################################
-class Gender(BaseModelName):
+class Gender(NREntity, BaseModelName):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
 
@@ -50,19 +43,17 @@ class Gender(BaseModelName):
 class Title(BaseModelName):
     stage_life = models.ForeignKey(
         StageLife,
-        related_name="titles",
         on_delete=models.CASCADE,
     )
     gender = models.ForeignKey(
         Gender,
-        related_name="titles",
         on_delete=models.CASCADE,
     )
     job = models.ForeignKey(
         Job,
-        related_name="titles",
-        null=True,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
 
     class Meta:
@@ -93,20 +84,17 @@ class Person(PolymorphicModel, BaseModel):
     gender = models.ForeignKey(
         Gender,
         on_delete=models.CASCADE,
-        related_name="persons",
     )
+    marital_status = models.ForeignKey(
+        MaritalStatus,
+        on_delete=models.CASCADE,
+    )  # الحاله الاجتماعيه
     Job = models.ForeignKey(
         Job,
         on_delete=models.SET_NULL,
-        related_name="persons",
         null=True,
         blank=True,
     )
-
-    # TODO
-    # title = models.ForeignKey(Title, on_delete=models.SET(
-    #     'Deleted FK'), related_name="persons", null=True, blank=True,
-    # )
     kinshipers = models.ManyToManyField(
         "self",
         through="Kinship",
@@ -118,6 +106,10 @@ class Person(PolymorphicModel, BaseModel):
         null=False,
         blank=False,
     )  # TODO E-mail
+
+    @property
+    def title(self) -> str:
+        return Title.objects.get(name=self.job).name
 
     @property
     def age(self):
@@ -156,12 +148,10 @@ class Kinship(models.Model):
     person = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,
-        related_name="person",
     )
     kinshiper = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,
-        related_name="kinshiper",
     )
     Relation = models.CharField(
         max_length=20,
@@ -175,12 +165,12 @@ class Kinship(models.Model):
         )
 
 
-# class Pharmaceutical(Person):
+# class Pharmaceutical(Product):
 #     pass
 
 
-# class Pharmacist(Person):  # صيدلي
-#     pass
+class Pharmacist(Person):  # صيدلي
+    pass
 
 
 class Customer(Person):
@@ -200,7 +190,7 @@ class Permission(BaseModelName):
 
 
 class Employee(Person):
-    branch = models.ForeignKey(Branch, on_delete=models.CASCAD)
+    branch = models.ForeignKey(to="Facilities.Branch", on_delete=models.CASCAD)
     salary = models.DecimalField(max_digits=5, decimal_places=2)
     attendance_time = models.TimeField()  # ميعاد الحضور
     check_out_time = models.TimeField()  # ميعاد الانصراف
@@ -231,12 +221,8 @@ class User(Person, AbstractBaseUser, PermissionsMixin):
 
 
 class Following(BaseModel):
-    followed = models.ForeignKey(
-        User, related_name="followed_set", on_delete=models.CASCADE
-    )
-    follower = models.ForeignKey(
-        User, related_name="followers", on_delete=models.CASCADE
-    )
+    followed = models.ForeignKey(User, on_delete=models.CASCADE)
+    follower = models.ForeignKey(User, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (
@@ -252,7 +238,7 @@ class Following(BaseModel):
 
 
 class Work(BaseModelName):
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
+    department = models.ForeignKey(to="Facilities.Department", on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
 
