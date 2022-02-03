@@ -1,9 +1,9 @@
-from articles.dataloaders import ArticleFavoriteDataLoader
-from articles.models import Article, Comment
-from core.mutations import AppResolverInfo
 from graphene import ID, Boolean, Int, List, Node, String
 from graphene_django import DjangoObjectType
-from users.types import Profile
+from .dataloaders import ArticleFavoriteDataLoader
+from .models import Article, Comment
+from GraphQL.mutations import AppResolverInfo
+from Persons.types import Profile
 
 ####################################
 #    Object Types

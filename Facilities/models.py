@@ -1,5 +1,5 @@
 from django.db import models
-
+# from djongo.models import ArrayReferenceField
 # from Persons.models import Person, Pharmacist
 from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
 from polymorphic.models import PolymorphicModel
@@ -7,11 +7,13 @@ from polymorphic.models import PolymorphicModel
 # Create your models here.
 
 
+class Job(PolymorphicModel, BaseModelName):
+    pass
+
+
 class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
-    # address = models.ForeignKey(Address, on_delete=models.CASCADE)
-    # telephone = models.ForeignKey(Address, on_delete=models.CASCADE)
-    # mobile = models.ForeignKey(Address, on_delete=models.CASCADE)
-    owner = models.ForeignKey(to="Persons.Prson", on_delete=models.CASCADE)
+    # TODO ADRESS TELPHONE LOCATION
+    owner = models.ForeignKey(to='Persons.Person', on_delete=models.CASCADE)
 
 
 class Store(Facility):  # مخازن
@@ -19,8 +21,7 @@ class Store(Facility):  # مخازن
 
 
 class Branch(BaseModelName, BaseModel):
-    # address = models.OneToOneField(Address, on_delete=models.CASCADE)
-    # telphone = models.OneToOneField(Telephone, on_delete=models.CASCADE)
+    # TODO ADRESS TELPHONE LOCATION
     facility = models.ForeignKey(Facility, on_delete=models.CASCADE)
     store = models.ForeignKey(Store, on_delete=models.CASCADE)
 
@@ -42,9 +43,14 @@ class PharmaceuticalCompany(Compony):  # شركات أدويه
     pass
 
 
+class Supplier(Compony):
+    pass
+    # brands = ArrayReferenceField(to=Brand, on_delete=models.CASCADE)
+
+
 class MedicalFacility(Facility):  # منشأه طبيه
     technical_supervisor = models.ForeignKey(
-        to="Persons.Pharmacist", on_delete=models.CASCADE
+        to='Persons.Pharmacist', on_delete=models.CASCADE
     )
 
 
@@ -90,3 +96,28 @@ class Associations(Facility):  # الجمعيات
 
 class Department(PolymorphicModel, BaseModelName):
     pass
+
+
+class NREntity(PolymorphicModel):
+    pass
+
+
+class Laboratory(Facility):
+    pass
+
+
+class MainLab(Laboratory):
+    pass
+
+
+class Lab(Laboratory):
+    pass
+
+
+class LabDepartment(Department):
+    pass
+
+
+class LabJob(Job):
+    department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
+

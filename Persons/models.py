@@ -1,20 +1,13 @@
-# from Facilities.models import Branch, Department
-from Languages.models import Language
-from Nady_System.models import NREntity
-from Persons.managers import FollowingManager, UsersManager
-from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
 from django.db import models  # from django.db.models import Model, ForeignKey, CASCADE
-
-from djongo.models import ArrayReferenceField
+from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from .managers import FollowingManager, UsersManager
 from GraphQL.models import BaseModel, BaseModelName
-
-# from Nady_System.models import BloodGroup
+from Facilities.models import Branch, Department, Job, NREntity
 from polymorphic.models import PolymorphicModel
-import calendar
+from djongo.models import ArrayReferenceField
+from Languages.models import Language
 from datetime import date
-
-# from django.apps import apps
-# MyModel = apps.get_model('myapp', 'MyModel')
+import calendar
 
 
 # Create your models here.
@@ -30,11 +23,6 @@ class MaritalStatus(BaseModelName):
     is_active = models.BooleanField(default=False)
 
 
-class Job(PolymorphicModel, BaseModelName):
-    pass
-
-
-###################################
 class Gender(NREntity, BaseModelName):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
@@ -165,10 +153,6 @@ class Kinship(models.Model):
         )
 
 
-# class Pharmaceutical(Product):
-#     pass
-
-
 class Pharmacist(Person):  # صيدلي
     pass
 
@@ -190,7 +174,7 @@ class Permission(BaseModelName):
 
 
 class Employee(Person):
-    branch = models.ForeignKey(to="Facilities.Branch", on_delete=models.CASCAD)
+    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     salary = models.DecimalField(max_digits=5, decimal_places=2)
     attendance_time = models.TimeField()  # ميعاد الحضور
     check_out_time = models.TimeField()  # ميعاد الانصراف
@@ -238,7 +222,7 @@ class Following(BaseModel):
 
 
 class Work(BaseModelName):
-    department = models.ForeignKey(to="Facilities.Department", on_delete=models.CASCADE)
+    department = models.ForeignKey(Department, on_delete=models.CASCADE)
     employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
 
 
@@ -262,3 +246,15 @@ class Attendance(models.Model):
     total_labor = models.DecimalField(max_digits=5, decimal_places=2)
     salary = models.DecimalField(max_digits=5, decimal_places=2)
     _date = models.DateField()
+
+
+class Specialization(BaseModelName):
+  pass
+
+
+class Doctor(Person):
+  specialization = models.CharField(max_length=50 )
+
+
+class LabEmployee(Employee):
+    pass

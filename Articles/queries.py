@@ -1,11 +1,11 @@
-import graphene_django_optimizer as gql_optimizer
-from articles.filters import ArticleFilterSet
-from articles.models import Article
-from articles.types import ArticleNode
-from core.mutations import AppResolverInfo
 from django.db.models.query import QuerySet
+import graphene_django_optimizer as gql_optimizer
 from graphene import Field, ObjectType, String
 from graphene_django.filter import DjangoFilterConnectionField
+from .filters import ArticleFilterSet
+from .models import Article
+from .types import ArticleNode
+from GraphQL.mutations import AppResolverInfo
 
 
 class ArticleQuery(ObjectType):

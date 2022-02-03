@@ -1,4 +1,4 @@
-from articles.models import Article
+from .models import Article
 from django.db.models import QuerySet
 from django_filters import CharFilter, FilterSet
 

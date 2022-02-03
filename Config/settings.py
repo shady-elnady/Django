@@ -55,15 +55,13 @@ INSTALLED_APPS = [
     "GraphQL",
     "Libraries",
     "Utils",
-    "Location",
     "Languages",
+    "Location",
     "Finances",  # ماليات
     "Facilities",  # منشآت
-    "Products",
     "Persons",
-    "Doctors",
+    "Products",
     "Nady_System",
-    "Social",
     "Articles",
 ]
 

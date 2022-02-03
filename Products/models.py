@@ -1,20 +1,44 @@
 from django.db import models
-from Facilities.models import Compony
-from GraphQL.models import BaseModel, BaseModelName
 from polymorphic.models import PolymorphicModel
+from GraphQL.models import BaseModel, BaseModelName
 from Location.models import Country
-
-# from Nady_System.models import Unit
+from Facilities.models import Compony
 from Persons.models import Customer, Employee
-from djongo.models import ArrayReferenceField
+# from djongo.models import ArrayReferenceield
 
 # Create your models here.
+
+
+
+class Unit(BaseModelName):
+    units_related = models.ManyToManyField(
+        "self",
+        through="UnitConvert",
+        symmetrical=False,
+    )
+
+
+class UnitConvert(models.Model):
+    from_unit = models.ForeignKey(
+        Unit,
+        on_delete=models.CASCADE,
+    )
+    to_unit = models.ForeignKey(
+        Unit,
+        on_delete=models.CASCADE,
+    )
+    factor = models.DecimalField(max_digits=5, decimal_places=4)
+
+    def __str__(self) -> str:
+        return f"{self.from_unit} -> {self.to_unit}"
+
+    class Meta:
+        unique_together = [["from_unit", "to_unit"]]
 
 
 class Brand(BaseModelName):
     made_in = models.ForeignKey(
         Country,
-        related_name="brands",
         on_delete=models.CASCADE,
     )
     logo_url = models.CharField(max_length=100, null=True, blank=True)
@@ -33,15 +57,15 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
         Package = "Package"
 
     brand = models.ForeignKey(
-        Brand,
+        to=Brand,
         on_delete=models.CASCADE,
     )
     image = models.ImageField(upload_to="images")
     serial = models.CharField(max_length=50, unique=True)
-    category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(to=SubCategory, on_delete=models.CASCADE)
     default_packing = models.CharField(max_length=10, choices=Packing.choices)
     package_size = models.DecimalField(max_digits=4, decimal_places=2)
-    measurment_unit = models.ForeignKey(to="Nady_System.Unit", on_delete=models.CASCADE)
+    measurment_unit = models.ForeignKey(to=Unit, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (
@@ -51,13 +75,13 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
 
 
 class Invoice(models.Model):
-    products = models.ManyToManyField(Product, through="LineInInvoice")
+    products = models.ManyToManyField(to=Product, through="LineInInvoice")
     recipient = models.ForeignKey(
-        Employee,
+        to=Employee,
         on_delete=models.SET("Deleted"),
     )  # موظف الاستقبال
     supplier = models.ForeignKey(
-        Compony,
+        to=Compony,
         on_delete=models.SET("Deleted"),
     )
     received_date = models.DateField(auto_now_add=True)
@@ -65,15 +89,15 @@ class Invoice(models.Model):
 
 class LineInInvoice(models.Model):  #  Many to Many RealtionShip Product + Invoice
     product = models.ForeignKey(
-        Product,
+        to=Product,
         on_delete=models.CASCADE,
     )
     invoice = models.ForeignKey(
-        Invoice,
+        to=Invoice,
         on_delete=models.CASCADE,
     )
     packing = models.ForeignKey(
-        Product,
+        to=Product,
         on_delete=models.CASCADE,
         to_field="default_packing",
     )
@@ -104,7 +128,7 @@ class Order(models.Model):
     required_date = models.DateTimeField(auto_now_add=True)
     shipped_date = models.DateTimeField(auto_now_add=True)
     total_price = models.DecimalField(max_digits=5, decimal_places=2)
-    comment = models.TextField(max_digits=200, decimal_places=2)
+    comment = models.TextField(max_length=300)
     products = models.ManyToManyField(Product, through="ProductOrder")
 
     # Invoice_Number	Charge or Cash Invoice Number	Int	11
@@ -112,8 +136,8 @@ class Order(models.Model):
 
 
 class ProductOrder:
-    product = models.ForeignKey(Product, on_delete=models.CASCADE)
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(to=Order, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=5, decimal_places=2)
     price = models.DecimalField(max_digits=5, decimal_places=2)
 
@@ -139,7 +163,7 @@ class ProductOrder:
 
 
 class Deal(PolymorphicModel):
-    order = models.ForeignKey(Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(to=Order, on_delete=models.CASCADE)
     # Invoice_Number	Charge or Cash Invoice Number	Int	11
     down_payment = models.DecimalField(max_digits=5, decimal_places=2)  # دفعه قدمه
     rebate = models.DecimalField(max_digits=5, decimal_places=2)  # الخصم
@@ -152,6 +176,3 @@ class CashDeal(Deal):
 class ChargeDeal(Deal):
     cost_charge = models.DecimalField(max_digits=5, decimal_places=2)  # تكلفه الشحن
 
-
-class Supplier(Compony):
-    brands = ArrayReferenceField(to=Brand, on_delete=models.CASCADE)

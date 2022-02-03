@@ -1,55 +1,17 @@
 from django.db import models
-from Facilities.models import Department, Facility
-from GraphQL.models import BaseModel, BaseModelName
 from djongo.models import ArrayReferenceField
-from polymorphic.models import PolymorphicModel
-
-from Persons.models import Employee, Job
-from Products.models import LineInInvoice, Product
+from GraphQL.models import BaseModel, BaseModelName
+from Facilities.models import MainLab, NREntity
+from Products.models import LineInInvoice, Product, Unit
 
 
 # Create your models here.
 
 
-# class Product:
-#     PUBLISHED = 1
-
-#     objects = ProductManager()
-
-
-class NREntity(PolymorphicModel):
-    pass
-
-
-class Laboratory(Facility):
-    pass
-
-
-class MainLab(Laboratory):
-    pass
-
-
-class Lab(Laboratory):
-    pass
-
-
-class LabDepartment(Department):
-    pass
-
-
-class LabJob(Job):
-    department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
-
-
-class LabEmployee(Employee):
-    pass
-
-
-# TODO
 class Stock(BaseModel):  # المخزون
     product = models.OneToOneField(Product, on_delete=models.CASCADE)
     details = ArrayReferenceField(
-        to=LineInInvoice,
+        LineInInvoice,
         on_delete=models.CASCADE,
     )
 
@@ -111,31 +73,6 @@ class DisksAntiBiotics(Kat):
     def __str__(self) -> str:
         return self.code
 
-
-class Unit(BaseModelName):
-    units_related = models.ManyToManyField(
-        "self",
-        through="UnitConvert",
-        symmetrical=False,
-    )
-
-
-class UnitConvert(models.Model):
-    from_unit = models.ForeignKey(
-        Unit,
-        on_delete=models.CASCADE,
-    )
-    to_unit = models.ForeignKey(
-        Unit,
-        on_delete=models.CASCADE,
-    )
-    factor = models.DecimalField(max_digits=5, decimal_places=4)
-
-    def __str__(self) -> str:
-        return f"{self.from_unit} -> {self.to_unit}"
-
-    class Meta:
-        unique_together = [["from_unit", "to_unit"]]
 
 
 class ShortCutParameter(BaseModelName):
@@ -303,6 +240,7 @@ class MainLabMenu(models.Model):
         null=True,
         blank=True,
     )  # التكلفه
+    # TODO RUN TIME handle Duration is best from TextChoices
     run_time = models.CharField(max_length=20, choices=RunTime.choices)
     # TODO Normal Range
     normal_range = models.ManyToManyField(
@@ -357,7 +295,7 @@ class HighLow(models.Model):  # ENUM
         high = "High"
         low = "Low"
 
-    name = models.CharField(max_length=10, primary_key=True, choices=HL.choices)
+    name = models.CharField(max_length=5, primary_key=True, choices=HL.choices)
 
 
 class Departement(BaseModelName):
