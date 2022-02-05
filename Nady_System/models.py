@@ -74,7 +74,6 @@ class DisksAntiBiotics(Kat):
         return self.code
 
 
-
 class ShortCutParameter(BaseModelName):
     pass
 
@@ -105,7 +104,7 @@ class ParameterUnit(models.Model):
     parameter_unit_related = models.ManyToManyField(
         "self",
         through="ParameterUnitConvert",
-        symmetrical=False,
+        symmetrical=True,
     )
 
     def __str__(self) -> str:
@@ -123,6 +122,7 @@ class ParameterUnitConvert(models.Model):
     to_parameter_unit = models.ForeignKey(
         ParameterUnit,
         on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_parameter_unit_convert",
     )
     factor = models.DecimalField(max_digits=5, decimal_places=4)
 
@@ -171,6 +171,12 @@ class SampleParameter(models.Model):
         return f"{self.sample}_{self.parameter}"
 
 
+class ENeedNormal(models.Model):
+    normal_range = models.ManyToManyField(
+        NREntity,
+    )
+
+
 class Analysis(models.Model):
     shortcuts = ArrayReferenceField(
         to=ShortCutParameter,
@@ -203,10 +209,10 @@ class Analysis(models.Model):
         through="MainLabMenu",
     )
     # TODO Normal Range
-    normal_range = models.ManyToManyField(
-        NREntity,
-        null=True,
-        blank=True,
+    normal_range = models.ForeignKey(
+        ENeedNormal,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_normal_range",
     )
 
     class Meta:
@@ -243,10 +249,10 @@ class MainLabMenu(models.Model):
     # TODO RUN TIME handle Duration is best from TextChoices
     run_time = models.CharField(max_length=20, choices=RunTime.choices)
     # TODO Normal Range
-    normal_range = models.ManyToManyField(
-        NREntity,
-        null=True,
-        blank=True,
+    normal_range = models.ForeignKey(
+        ENeedNormal,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_normal_range",
     )
     is_default = models.BooleanField(default=True)
 

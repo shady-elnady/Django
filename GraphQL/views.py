@@ -7,7 +7,7 @@ from django.views.generic.base import TemplateView
 
 
 class GraphQLPlaygroundView(TemplateView):
-    template_name = "playground.html"
+    template_name = "GraphQL/playground.html"
 
     endpoint: str = None
     subscription_endpoint: str = None

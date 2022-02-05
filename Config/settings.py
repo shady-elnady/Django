@@ -174,7 +174,13 @@ USE_TZ = True
 
 STATIC_URL = "static/"
 
-STATIC_ROOT = BASE_DIR / "static"
+if DEBUG:
+    STATICFILES_DIRS = [
+        BASE_DIR / "static",
+    ]
+else:
+    STATIC_ROOT = BASE_DIR / "static"
+
 
 MEDIA_URL = "media/"
 
@@ -188,20 +194,17 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 SPAGHETTI_SAUCE = {
     "apps": [
         "auth",
-        "Persons",
-        "Utils",
-        "Products",
-        "Nady_System",
-        "Libraries",
         "GraphQL",
-        "Doctors",
-        "Facilities",
-        "Social",
-        "Finances",
-        "Facilities",
-        "Articles",
+        "Libraries",
+        "Utils",
         "Languages",
         "Location",
+        "Finances",  # ماليات
+        "Facilities",  # منشآت
+        "Persons",
+        "Products",
+        "Nady_System",
+        "Articles",
     ],
     "show_fields": True,
     "exclude": {"auth": ["user"]},
@@ -233,6 +236,6 @@ GRAPHQL_JWT = {
     "JWT_EXPIRATION_DELTA": timedelta(days=1),
 }
 
-LOGIN_REDIRECT_URL = "home"
+# LOGIN_REDIRECT_URL = "home"
 
-LOGOUT_REDIRECT_URL = "home"
+# LOGOUT_REDIRECT_URL = "home"

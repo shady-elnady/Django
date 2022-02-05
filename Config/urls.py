@@ -21,11 +21,13 @@ import debug_toolbar
 from GraphQL.views import GraphQLPlaygroundView
 from django.views.decorators.csrf import csrf_exempt
 from graphene_file_upload.django import FileUploadGraphQLView
+from Nady_System.views import helth
 
 urlpatterns = [
-    path('', include('Nady_System.urls')),
-    path('admin/', admin.site.urls),
-    path('entity/', include('django_spaghetti.urls')),
+    path("", include("Nady_System.urls")),
+    path("helth/", helth),
+    path("admin/", admin.site.urls),
+    path("entity/", include("django_spaghetti.urls")),
     path(
         "graphql",
         csrf_exempt(
@@ -34,8 +36,9 @@ urlpatterns = [
             )
         ),
     ),
-    path("playground", csrf_exempt(
-        GraphQLPlaygroundView.as_view(endpoint="/graphql")),
+    path(
+        "playground",
+        csrf_exempt(GraphQLPlaygroundView.as_view(endpoint="/graphql")),
     ),
     path("__debug__/", include(debug_toolbar.urls)),
 ]

@@ -4,10 +4,9 @@ from GraphQL.models import BaseModel, BaseModelName
 from Location.models import Country
 from Facilities.models import Compony
 from Persons.models import Customer, Employee
-# from djongo.models import ArrayReferenceield
+
 
 # Create your models here.
-
 
 
 class Unit(BaseModelName):
@@ -26,6 +25,7 @@ class UnitConvert(models.Model):
     to_unit = models.ForeignKey(
         Unit,
         on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_unit_convert",
     )
     factor = models.DecimalField(max_digits=5, decimal_places=4)
 
@@ -57,15 +57,15 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
         Package = "Package"
 
     brand = models.ForeignKey(
-        to=Brand,
+        Brand,
         on_delete=models.CASCADE,
     )
     image = models.ImageField(upload_to="images")
     serial = models.CharField(max_length=50, unique=True)
-    category = models.ForeignKey(to=SubCategory, on_delete=models.CASCADE)
+    category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
     default_packing = models.CharField(max_length=10, choices=Packing.choices)
     package_size = models.DecimalField(max_digits=4, decimal_places=2)
-    measurment_unit = models.ForeignKey(to=Unit, on_delete=models.CASCADE)
+    measurment_unit = models.ForeignKey(Unit, on_delete=models.CASCADE)
 
     class Meta:
         unique_together = (
@@ -75,32 +75,30 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
 
 
 class Invoice(models.Model):
-    products = models.ManyToManyField(to=Product, through="LineInInvoice")
+    products = models.ManyToManyField(Product, through="LineInInvoice")
     recipient = models.ForeignKey(
-        to=Employee,
+        Employee,
         on_delete=models.SET("Deleted"),
     )  # موظف الاستقبال
     supplier = models.ForeignKey(
-        to=Compony,
+        Compony,
         on_delete=models.SET("Deleted"),
     )
     received_date = models.DateField(auto_now_add=True)
 
 
 class LineInInvoice(models.Model):  #  Many to Many RealtionShip Product + Invoice
+    invoice = models.ForeignKey(Invoice, on_delete=models.CASCADE)
     product = models.ForeignKey(
-        to=Product,
+        Product,
         on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_product",
     )
-    invoice = models.ForeignKey(
-        to=Invoice,
-        on_delete=models.CASCADE,
-    )
-    packing = models.ForeignKey(
-        to=Product,
-        on_delete=models.CASCADE,
-        to_field="default_packing",
-    )
+    # packing = models.ForeignKey(
+    #     Product,
+    #     on_delete=models.CASCADE,
+    #     to_field="default_packing",
+    # )
     packing_price = models.DecimalField(max_digits=5, decimal_places=2)
     expire_date = models.DateField(blank=True, null=True)
     count_packing = models.DecimalField(max_digits=5, decimal_places=2)
@@ -112,8 +110,8 @@ class LineInInvoice(models.Model):  #  Many to Many RealtionShip Product + Invoi
     class Meta:
         unique_together = [
             [
-                "product",
                 "invoice",
+                "product",
             ]
         ]
 
@@ -135,9 +133,9 @@ class Order(models.Model):
     # OR_Number	Official Receipt Number	Int	11
 
 
-class ProductOrder:
-    product = models.ForeignKey(to=Product, on_delete=models.CASCADE)
-    order = models.ForeignKey(to=Order, on_delete=models.CASCADE)
+class ProductOrder(models.Model):
+    product = models.ForeignKey(Product, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     quantity = models.DecimalField(max_digits=5, decimal_places=2)
     price = models.DecimalField(max_digits=5, decimal_places=2)
 
@@ -163,7 +161,7 @@ class ProductOrder:
 
 
 class Deal(PolymorphicModel):
-    order = models.ForeignKey(to=Order, on_delete=models.CASCADE)
+    order = models.ForeignKey(Order, on_delete=models.CASCADE)
     # Invoice_Number	Charge or Cash Invoice Number	Int	11
     down_payment = models.DecimalField(max_digits=5, decimal_places=2)  # دفعه قدمه
     rebate = models.DecimalField(max_digits=5, decimal_places=2)  # الخصم
@@ -175,4 +173,3 @@ class CashDeal(Deal):
 
 class ChargeDeal(Deal):
     cost_charge = models.DecimalField(max_digits=5, decimal_places=2)  # تكلفه الشحن
-

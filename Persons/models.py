@@ -140,6 +140,7 @@ class Kinship(models.Model):
     kinshiper = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_kinshiper",
     )
     Relation = models.CharField(
         max_length=20,
@@ -206,7 +207,11 @@ class User(Person, AbstractBaseUser, PermissionsMixin):
 
 class Following(BaseModel):
     followed = models.ForeignKey(User, on_delete=models.CASCADE)
-    follower = models.ForeignKey(User, on_delete=models.CASCADE)
+    follower = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_follower",
+    )
 
     class Meta:
         unique_together = (
@@ -249,11 +254,11 @@ class Attendance(models.Model):
 
 
 class Specialization(BaseModelName):
-  pass
+    pass
 
 
 class Doctor(Person):
-  specialization = models.CharField(max_length=50 )
+    specialization = models.CharField(max_length=50)
 
 
 class LabEmployee(Employee):

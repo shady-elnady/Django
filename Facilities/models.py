@@ -1,4 +1,5 @@
 from django.db import models
+
 # from djongo.models import ArrayReferenceField
 # from Persons.models import Person, Pharmacist
 from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
@@ -13,7 +14,7 @@ class Job(PolymorphicModel, BaseModelName):
 
 class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
     # TODO ADRESS TELPHONE LOCATION
-    owner = models.ForeignKey(to='Persons.Person', on_delete=models.CASCADE)
+    owner = models.ForeignKey(to="Persons.Person", on_delete=models.CASCADE)
 
 
 class Store(Facility):  # مخازن
@@ -22,8 +23,16 @@ class Store(Facility):  # مخازن
 
 class Branch(BaseModelName, BaseModel):
     # TODO ADRESS TELPHONE LOCATION
-    facility = models.ForeignKey(Facility, on_delete=models.CASCADE)
-    store = models.ForeignKey(Store, on_delete=models.CASCADE)
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_facility",
+    )
+    store = models.ForeignKey(
+        Store,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_store",
+    )
 
 
 class MobileNetWork(Facility):  # شركات محمول
@@ -50,7 +59,7 @@ class Supplier(Compony):
 
 class MedicalFacility(Facility):  # منشأه طبيه
     technical_supervisor = models.ForeignKey(
-        to='Persons.Pharmacist', on_delete=models.CASCADE
+        to="Persons.Pharmacist", on_delete=models.CASCADE
     )
 
 
@@ -120,4 +129,3 @@ class LabDepartment(Department):
 
 class LabJob(Job):
     department = models.ForeignKey(LabDepartment, on_delete=models.CASCADE)
-

@@ -2,8 +2,8 @@ python3 -m venv venv
 source venv/bin/activate
 python3 -m pip install --upgrade pip
 pip3 install django
-pip3 install python-decouple
 django-admin startproject Config .
+pip3 install python-decouple
 
 # Apps
 python3 manage.py startapp GraphQL
