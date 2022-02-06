@@ -8,6 +8,7 @@ from .views import (
     team,
     blog,
     contact,
+    paypal,
 )
 
 app_name = "Nady_System"
@@ -21,4 +22,5 @@ urlpatterns = [
     path("team/", team, name="team"),
     path("blog/", blog, name="blog"),
     path("contact/", contact, name="contact"),
+    path("paypal/", paypal, name="paypal"),
 ]

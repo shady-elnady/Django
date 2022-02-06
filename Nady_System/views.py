@@ -37,3 +37,7 @@ def blog(req):
 
 def contact(req):
     return render(req, "lab/contact.html")
+
+
+def paypal(req):
+    return render(req, "paypal.html")

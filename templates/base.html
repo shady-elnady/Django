@@ -81,6 +81,9 @@
                         <li>
                             <a class="nav-link {% if request.resolver_match.view_name == 'Nady_System:contact' %}active{% endif %}" href="{% url 'Nady_System:contact' %}">Contact</a>
                         </li>
+                        <li>
+                            <a class="nav-link {% if request.resolver_match.view_name == 'Nady_System:paypal' %}active{% endif %}" href="{% url 'Nady_System:paypal' %}">Paypal</a>
+                        </li>
                     </ul>
                 </div>
             </div>
@@ -165,6 +168,9 @@
     <script src="{% static 'js/isotope.min.js' %}"></script>
     <script src="{% static 'js/images-loded.min.js' %}"></script>
     <script src="{% static 'js/custom.js' %}"></script>
+
+
+    {% block Scripts %} {% endblock Scripts %}
 
 
 </body>
