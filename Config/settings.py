@@ -51,6 +51,7 @@ INSTALLED_APPS = [
     "polymorphic",
     "mptt",
     "import_export",
+    "bootstrap5",
     ## My Apps
     "GraphQL",
     "Libraries",
@@ -236,6 +237,10 @@ GRAPHQL_JWT = {
     "JWT_EXPIRATION_DELTA": timedelta(days=1),
 }
 
-# LOGIN_REDIRECT_URL = "home"
 
-# LOGOUT_REDIRECT_URL = "home"
+LOGIN_REDIRECT_URL = "/"
+
+LOGOUT_REDIRECT_URL = "login"
+
+
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"

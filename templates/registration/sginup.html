@@ -1,0 +1,9 @@
+{% extends './base_generic.html' %} {% load static %} {# Load the tag library #} {% load bootstrap5 %} {# Load CSS and JavaScript #} {% bootstrap_css %} {% bootstrap_javascript %} {# Display django.contrib.messages as Bootstrap alerts #} {% bootstrap_messages
+%} {% block Title %}Sgin Up {% endblock Title %} {% block Content %}
+
+<form method="post">
+    {% csrf_token %} {% bootstrap_form form %}
+    <input type="submit" value="Sgin Up" />
+</form>
+
+{% endblock Content %}

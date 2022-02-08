@@ -27,6 +27,7 @@ pip3 install django-import-export
 pip3 install django-debug-toolbar
 pip3 install graphene-file-upload
 pip3 install graphene-django-optimizer
+pip install django-bootstrap-v5
 
 # Commands
 python3 manage.py makemigrations

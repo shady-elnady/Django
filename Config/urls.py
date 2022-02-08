@@ -27,10 +27,12 @@ urlpatterns = [
     path("", include("Nady_System.urls")),
     path("helth/", helth),
     path("admin/", admin.site.urls),
+    path("accounts/", include("django.contrib.auth.urls")),
+    path("accounts/", include("Persons.urls", namespace="accounts")),
     path("entity/", include("django_spaghetti.urls")),
     path(
         "graphql",
-        csrf_exempt(
+        csrf_exempt( 
             FileUploadGraphQLView.as_view(
                 graphiql=False,
             )

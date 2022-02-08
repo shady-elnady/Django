@@ -1,12 +1,16 @@
 from django.shortcuts import render
+from django.contrib.auth.decorators import login_required
+
 
 # Create your views here.
 
 
+@login_required
 def helth(req):
     return render(req, "helth.html")
 
 
+@login_required
 def home(req):
     return render(req, "lab/home.html")
 

@@ -60,9 +60,20 @@ class Person(PolymorphicModel, BaseModel):
         blank=True,
         null=True,
     )
-    full_name = models.CharField(max_length=80, unique=True)
-    family_name = models.CharField(max_length=15)
-    birth_date = models.DateField()
+    full_name = models.CharField(
+        max_length=80,
+        unique=True,
+        blank=True,
+        null=True,
+    )
+    family_name = models.CharField(
+        max_length=15,
+        blank=True,
+        null=True,
+    )
+    birth_date = models.DateField(
+        blank=True,
+        null=True,)
     image_url = models.ImageField(
         upload_to="images",
         editable=True,
@@ -72,10 +83,14 @@ class Person(PolymorphicModel, BaseModel):
     gender = models.ForeignKey(
         Gender,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )
     marital_status = models.ForeignKey(
         MaritalStatus,
         on_delete=models.CASCADE,
+        blank=True,
+        null=True,
     )  # الحاله الاجتماعيه
     Job = models.ForeignKey(
         Job,
