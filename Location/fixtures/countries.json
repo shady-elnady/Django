@@ -1,0 +1,49 @@
+[{
+        "model": "Location.Country",
+        "pk": "Egypt",
+        "fields": {
+            "native": "مصر",
+            "continents": ["Africa"],
+            "capital": "Cairo",
+            "flag": "🇪🇬",
+            "flags_svg": "",
+            "postalCode": "",
+            "timezones": "UTC+02:00",
+            "currencies": ["Egyptian pound"],
+            "languages": ["Arabic"],
+            "Tel_code": "002"
+        }
+    },
+    {
+        "model": "Location.Country",
+        "pk": "United Arab Emirates",
+        "fields": {
+            "native": "دولة الإمارات العربية المتحدة",
+            "continents": ["Asia"],
+            "capital": "Abu Dhabi",
+            "flag": "🇦🇪",
+            "flags_svg": "",
+            "postalCode": "",
+            "timezones": "UTC+02:00",
+            "currencies": ["AED"],
+            "languages": ["Arabic"],
+            "Tel_code": "971"
+        }
+    },
+    {
+        "model": "Location.Country",
+        "pk": "France",
+        "fields": {
+            "native": "République française",
+            "continents": ["Europe"],
+            "capital": "Paris",
+            "flag": "🇫🇷",
+            "flags_svg": "",
+            "postalCode": "",
+            "timezones": "UTC+02:00",
+            "currencies": ["Euro"],
+            "languages": ["French"],
+            "Tel_code": "33"
+        }
+    }
+]

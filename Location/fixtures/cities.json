@@ -1,0 +1,33 @@
+[{
+        "model": "Location.City",
+        "pk": "Mansoura",
+        "fields": {
+            "native": "المنصوره",
+            "province": "Dakahlia"
+        }
+    },
+    {
+        "model": "Location.City",
+        "pk": "Sherbin",
+        "fields": {
+            "native": "شربين",
+            "province": "Dakahlia"
+        }
+    },
+    {
+        "model": "Location.City",
+        "pk": "Belqas",
+        "fields": {
+            "native": "بلقاس",
+            "province": "Dakahlia"
+        }
+    },
+    {
+        "model": "Location.City",
+        "pk": "Talkha",
+        "fields": {
+            "native": "طلخا",
+            "province": "Dakahlia"
+        }
+    }
+]

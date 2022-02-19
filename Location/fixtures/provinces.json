@@ -1,0 +1,235 @@
+[{
+        "model": "Location.Province",
+        "pk": "Cairo",
+        "fields": {
+            "native": "القاهره",
+            "tel_code": "02",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Alexandria",
+        "fields": {
+            "native": "الاسكندريه",
+            "tel_code": "03",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Dakahlia",
+        "fields": {
+            "native": "الدقهليه",
+            "tel_code": "050",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Aswan",
+        "fields": {
+            "native": "أسوان",
+            "tel_code": "097",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Arish",
+        "fields": {
+            "native": "العريش",
+            "tel_code": "068",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Beni Suef",
+        "fields": {
+            "native": "بنى سويف",
+            "tel_code": "082",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Damietta",
+        "fields": {
+            "native": "دمياط",
+            "tel_code": "057",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Ismailia",
+        "fields": {
+            "native": "اسماعليه",
+            "tel_code": "064",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Luxor",
+        "fields": {
+            "native": "الاقصر",
+            "tel_code": "095",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Monufia",
+        "fields": {
+            "native": "منوفيه",
+            "tel_code": "048",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Port Said",
+        "fields": {
+            "native": "بورسعيد",
+            "tel_code": "066",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Red Sea",
+        "fields": {
+            "native": "البحرالاحمر",
+            "tel_code": "065",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Suez",
+        "fields": {
+            "native": "سويس",
+            "tel_code": "062",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "El Tour",
+        "fields": {
+            "native": "الطور",
+            "tel_code": "069",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "10th of Ramadan",
+        "fields": {
+            "native": "العاشر من رمضان",
+            "tel_code": "055",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Asyut",
+        "fields": {
+            "native": "أسيوط",
+            "tel_code": "088",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Damanhur",
+        "fields": {
+            "native": "دمنهور",
+            "tel_code": "04",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Faiyum",
+        "fields": {
+            "native": "فيوم",
+            "tel_code": "048",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Kafr El Sheikh",
+        "fields": {
+            "native": "كفرالشيخ",
+            "tel_code": "047",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Marsa Matruh",
+        "fields": {
+            "native": "مرسى مطروح",
+            "tel_code": "046",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Minya",
+        "fields": {
+            "native": "منيا",
+            "tel_code": "086",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "New Valley",
+        "fields": {
+            "native": "الوادى الجديد",
+            "tel_code": "092",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Sohag",
+        "fields": {
+            "native": "سوهاج",
+            "tel_code": "093",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Qena",
+        "fields": {
+            "native": "قنا",
+            "tel_code": "096",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Tanta",
+        "fields": {
+            "native": "طنطا",
+            "tel_code": "040",
+            "country": "Egypt"
+        }
+    },
+    {
+        "model": "Location.Province",
+        "pk": "Qalyubia",
+        "fields": {
+            "native": "قليوبيه",
+            "tel_code": "013",
+            "country": "Egypt"
+        }
+    }
+]

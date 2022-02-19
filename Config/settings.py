@@ -13,6 +13,8 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+from django.utils.translation import gettext_lazy as _
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -38,11 +40,12 @@ ALLOWED_HOSTS = [
 
 INSTALLED_APPS = [
     "django.contrib.admin",
-    "django.contrib.auth",
+    "django.contrib.auth",  # required for allauth
     "django.contrib.contenttypes",
     "django.contrib.sessions",
-    "django.contrib.messages",
+    "django.contrib.messages",  # required for allauth
     "django.contrib.staticfiles",
+    "django.contrib.sites",  # required for allauth
     ## Libraries
     "graphene_django",
     "django_filters",
@@ -52,13 +55,44 @@ INSTALLED_APPS = [
     "mptt",
     "import_export",
     "bootstrap5",
+    "countries_plus",
+    "languages_plus",
+    # "django_countries",
+    # "cities",
+    "django_prices",
+    "currencies",
+    "crispy_forms",
+    # allauth
+    "allauth",
+    "allauth.account",
+    "allauth.socialaccount",
+    # ... include the providers you want to enable:
+    "allauth.socialaccount.providers.amazon",
+    "allauth.socialaccount.providers.amazon_cognito",
+    "allauth.socialaccount.providers.apple",
+    "allauth.socialaccount.providers.auth0",
+    "allauth.socialaccount.providers.authentiq",
+    "allauth.socialaccount.providers.azure",
+    "allauth.socialaccount.providers.bitbucket",
+    "allauth.socialaccount.providers.facebook",
+    "allauth.socialaccount.providers.github",
+    "allauth.socialaccount.providers.google",
+    "allauth.socialaccount.providers.linkedin",
+    "allauth.socialaccount.providers.microsoft",
+    "allauth.socialaccount.providers.paypal",
+    "allauth.socialaccount.providers.spotify",
+    "allauth.socialaccount.providers.telegram",
+    "allauth.socialaccount.providers.trello",
+    "allauth.socialaccount.providers.twitter",
+    "allauth.socialaccount.providers.yahoo",
+    "allauth.socialaccount.providers.zoom",
     ## My Apps
     "GraphQL",
+    "Languages",
     "Libraries",
     "Utils",
-    "Languages",
     "Location",
-    "Finances",  # ماليات
+    "Payment",  # ماليات
     "Facilities",  # منشآت
     "Persons",
     "Products",
@@ -69,6 +103,7 @@ INSTALLED_APPS = [
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
+    "django.middleware.locale.LocaleMiddleware",  # For Translation
     "django.middleware.common.CommonMiddleware",
     "django.middleware.csrf.CsrfViewMiddleware",
     "django.contrib.auth.middleware.AuthenticationMiddleware",
@@ -77,6 +112,25 @@ MIDDLEWARE = [
 ]
 
 ROOT_URLCONF = "Config.urls"
+
+## NOTE All Auth Setting:
+
+SITE_ID = 1
+
+# Provider specific settings
+SOCIALACCOUNT_PROVIDERS = {
+    "google": {
+        # For each OAuth based provider, either add a ``SocialApp``
+        # (``socialaccount`` app) containing the required client
+        # credentials, or list them here:
+        "APP": {
+            "client_id": "643557013339-dh57soae8v352ma31hg0jh9q61bq6mv1.apps.googleusercontent.com",
+            "secret": "p7nT4ELhWDVyT6a_4Fy2Yppg",
+            "key": "AIzaSyAMKZolIIE9Na-CyWIP6tYDj5CBaN5EvyU",
+        }
+    }
+}
+
 
 TEMPLATES = [
     {
@@ -88,8 +142,10 @@ TEMPLATES = [
         "OPTIONS": {
             "context_processors": [
                 "django.template.context_processors.debug",
-                "django.template.context_processors.request",
+                "django.template.context_processors.request",  # `allauth` needs this from django
+                "currencies.context_processors.currencies",  #  required for Django Currencies
                 "django.contrib.auth.context_processors.auth",
+                "django.template.context_processors.i18n",  # For Translation
                 "django.contrib.messages.context_processors.messages",
             ],
         },
@@ -158,18 +214,6 @@ AUTH_PASSWORD_VALIDATORS = [
 ]
 
 
-# Internationalization
-# https://docs.djangoproject.com/en/4.0/topics/i18n/
-
-LANGUAGE_CODE = "en-us"
-
-TIME_ZONE = "UTC"
-
-USE_I18N = True
-
-USE_TZ = True
-
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.0/howto/static-files/
 
@@ -200,7 +244,7 @@ SPAGHETTI_SAUCE = {
         "Utils",
         "Languages",
         "Location",
-        "Finances",  # ماليات
+        "Payment",  # ماليات
         "Facilities",  # منشآت
         "Persons",
         "Products",
@@ -229,7 +273,10 @@ GRAPHENE = {
 
 AUTHENTICATION_BACKENDS = [
     "graphql_jwt.backends.JSONWebTokenBackend",
+    # Needed to login by username in Django admin, regardless of `allauth`
     "django.contrib.auth.backends.ModelBackend",
+    # `allauth` specific authentication methods, such as login by e-mail
+    "allauth.account.auth_backends.AuthenticationBackend",
 ]
 
 GRAPHQL_JWT = {
@@ -244,3 +291,56 @@ LOGOUT_REDIRECT_URL = "login"
 
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+
+
+# Internationalization
+# https://docs.djangoproject.com/en/4.0/topics/i18n/
+
+
+TIME_ZONE = "UTC"
+
+USE_TZ = True
+
+## TODO Languages Setting
+
+USE_I18N = True
+
+LANGUAGE_CODE = "en-us"
+
+LANGUAGES = [
+    ("en", _("English")),
+    ("ar", _("Arabic")),
+    ("ar", _("Arabic")),
+]
+
+
+# True for right-to-left languages like Arabic, and to False otherwise
+LANGUAGE_BIDI = False
+
+LOCALE_PATHS = (BASE_DIR / "locale/",)
+
+
+# Crispy forms
+CRISPY_ALLOWED_TEMPLATE_PACKS = (
+    "bootstrap",
+    "uni_form",
+    "bootstrap3",
+    "bootstrap4",
+    "crispy-bootstrap5",
+)
+CRISPY_TEMPLATE_PACK = "crispy-bootstrap5"
+CRISPY_CLASS_CONVERTERS = {
+    "textinput": "form-control textinput",
+    "passwordinput": "form-control passwordinput",
+    "radioinput": "form-control",
+}
+
+
+GDAL_LIBRARY_PATH = (
+    r"E:\Django\Nady Lab System\Django\venv\Lib\site-packages\osgeo\gdal304.dll"
+)
+
+
+GEOS_LIBRARY_PATH = (
+    r"E:\Django\Nady Lab System\Django\venv\Lib\site-packages\osgeo\geos_c.dll"
+)

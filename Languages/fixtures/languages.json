@@ -1,0 +1,112 @@
+[{
+        "model": "Languages.Language",
+        "pk": "English",
+        "fields": {
+            "native": "English",
+            "rtl": false,
+            "iso_639_1": "en",
+            "is_active": true
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Arabic",
+        "fields": {
+            "native": "العربيه",
+            "rtl": true,
+            "iso_639_1": "ar",
+            "is_active": true
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "French",
+        "fields": {
+            "native": "français",
+            "rtl": false,
+            "iso_639_1": "fr",
+            "is_active": true
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Chuvash",
+        "fields": {
+            "native": "чӑваш чӗлхи",
+            "rtl": false,
+            "iso_639_1": "cv",
+            "is_active": false
+        }
+    },
+
+    {
+        "model": "Languages.Language",
+        "pk": "German",
+        "fields": {
+            "native": "Deutsch",
+            "rtl": false,
+            "iso_639_1": "de",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Italian",
+        "fields": {
+            "native": "Italiano",
+            "rtl": false,
+            "iso_639_1": "it",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Kurdish",
+        "fields": {
+            "native": "Kurdî, کوردی",
+            "rtl": true,
+            "iso_639_1": "ku",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Japanese",
+        "fields": {
+            "native": "日本語 (にほんご)",
+            "rtl": false,
+            "iso_639_1": "ja",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Russian",
+        "fields": {
+            "native": "русский",
+            "rtl": false,
+            "iso_639_1": "ru",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Spanish",
+        "fields": {
+            "native": "Española",
+            "rtl": false,
+            "iso_639_1": "es",
+            "is_active": false
+        }
+    },
+    {
+        "model": "Languages.Language",
+        "pk": "Turkish",
+        "fields": {
+            "native": "Türkçe",
+            "rtl": false,
+            "iso_639_1": "tr",
+            "is_active": false
+        }
+    }
+]

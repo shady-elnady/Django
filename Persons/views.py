@@ -13,13 +13,16 @@ def signUp(req):
         if form.is_valid():
             form.save()
             username = form.cleaned_data["username"]
-            email = form.cleaned_data["email"]
-            user = authenticate(username=username, email=email)
+            password = form.cleaned_data["password1"]
+            user = authenticate(username=username, password=password)
             login(req, user)
             return redirect(settings.LOGIN_REDIRECT_URL)
-        else:
-            print("form Not Valid")
+
     else:
         form = SignUpForm()
 
-    return render(req, "registration/sginup.html", {"form": form})
+    context = {
+        "form": form,
+    }
+
+    return render(req, "registration/signUp.html", context=context)

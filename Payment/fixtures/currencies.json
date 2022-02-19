@@ -1,0 +1,147 @@
+[{
+        "model": "Payment.Currency",
+        "pk": "Dollar",
+        "fields": {
+            "native": "Dollar United States",
+            "code": "USD",
+            "emoji": "💲"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Rupee's India",
+        "fields": {
+            "native": "Rupee's India",
+            "code": "INR",
+            "emoji": "₹"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dollar's Taiwan",
+        "fields": {
+            "native": "",
+            "code": "TWD",
+            "emoji": "🇹🇼"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Euro",
+        "fields": {
+            "native": "Euro",
+            "code": "EUR",
+            "emoji": "💶 €"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Yen",
+        "fields": {
+            "native": "円",
+            "code": "JPY",
+            "emoji": "💴"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Lira's Turkey",
+        "fields": {
+            "native": "",
+            "code": "TRY",
+            "emoji": "₺"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Egyptian pound",
+        "fields": {
+            "native": "جنيه مصرى",
+            "code": "EGP",
+            "emoji": "💷"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dinar's Jordan",
+        "fields": {
+            "native": "دينار أردنى",
+            "code": "JOD",
+            "emoji": ""
+        },
+        "equal_dolar": "",
+        "last_update": ""
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dinar's Kuwait",
+        "fields": {
+            "native": "دينار كويتى",
+            "code": "KWD",
+            "emoji": "🇰🇼"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dinar's Libya",
+        "fields": {
+            "native": "دينار ليبى",
+            "code": "LYD",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dinar's Tunisia",
+        "fields": {
+            "native": "دينار تونسى",
+            "code": "TND",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dinar's Iraq",
+        "fields": {
+            "native": "دينار عراقى",
+            "code": "IQD",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Riyal's Qatar",
+        "fields": {
+            "native": "ريال قطرى",
+            "code": "QAR",
+            "emoji": ""
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Riyal's Saudi Arabia",
+        "fields": {
+            "native": "ريال سعودى",
+            "code": "SAR",
+            "emoji": "🇸🇦"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Riyal's Oman",
+        "fields": {
+            "native": "ريال عمانى",
+            "code": "OMR",
+            "emoji": "🏳️‍🌈"
+        }
+    },
+    {
+        "model": "Payment.Currency",
+        "pk": "Dirham",
+        "fields": {
+            "native": "درهم إمارتى",
+            "code": "AED",
+            "emoji": "🇦🇪"
+        }
+    }
+]

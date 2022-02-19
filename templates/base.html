@@ -1,5 +1,6 @@
-{% load static %} {# Load the tag library #} {% load bootstrap5 %} {# Load CSS and JavaScript #} {% bootstrap_css %} {% bootstrap_javascript %} {# Display django.contrib.messages as Bootstrap alerts #} {% bootstrap_messages %}
+{% load static %} {% load i18n %} {% load currency %}
 
+{# Load the tag library #} {% load bootstrap5 %} {# Load CSS and JavaScript #} {% bootstrap_css %} {% bootstrap_javascript %} {# Display django.contrib.messages as Bootstrap alerts #} {% bootstrap_messages %}
 <!DOCTYPE html>
 <html lang="en">
 <!-- Basic -->
@@ -84,7 +85,7 @@
                             <a class="nav-link {% if request.resolver_match.view_name == 'Nady_System:contact' %}active{% endif %}" href="{% url 'Nady_System:contact' %}">Contact</a>
                         </li>
                         <li>
-                            <a class="nav-link {% if request.resolver_match.view_name == 'Nady_System:paypal' %}active{% endif %}" href="{% url 'Nady_System:paypal' %}">Paypal</a>
+                            <a class="nav-link {% if request.resolver_match.view_name == 'Payment:paypal' %}active{% endif %}" href="{% url 'Payment:paypal' %}">Paypal</a>
                         </li>
                     </ul>
                 </div>

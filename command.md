@@ -28,6 +28,17 @@ pip3 install django-debug-toolbar
 pip3 install graphene-file-upload
 pip3 install graphene-django-optimizer
 pip install django-bootstrap-v5
+pip install django-languages-plus
+pip install django-countries
+pip install django-allauth
+pip install django-crispy-forms
+pip install django-prices
+pip install django-measurement
+pip install django-pint
+pip install django-cities
+pip install django-currencies
+pip install django-timezone-field
+
 
 # Commands
 python3 manage.py makemigrations
@@ -36,6 +47,13 @@ python3 manage.py runserver
 pip3 freeze
 pip3 freeze > requirements.txt
 deactivate
+
+    - Languages 
+        python manage.py makemessages -l en
+        python manage.py makemessages -l ar
+        python manage.py compilemessages
+
+        python manage.py loaddata languages_data.json.gz
 
 pip3 install -r requirements.txt
 
