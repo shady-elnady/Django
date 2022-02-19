@@ -273,7 +273,7 @@ class AnalyzerKatTechniqueMethod(models.Model):
         verbose_name_plural = _("Analyzer Kat Technique Methods")
 
 
-class GroupShortCut(PolymorphicModel):  # Generalization for Price And ShortCut
+class BlockOfAnalysis(PolymorphicModel):  # Generalization for Price And ShortCut
     shortcuts = ArrayReferenceField(
         to=ShortCutParameter,
         on_delete=models.CASCADE,
@@ -307,9 +307,9 @@ class GroupShortCut(PolymorphicModel):  # Generalization for Price And ShortCut
         verbose_name_plural = _("Group ShortCuts")
 
 
-class Package(BaseModelName, GroupShortCut):
+class Package(BaseModelName, BlockOfAnalysis):
     analysis_in_package = models.ManyToManyField(
-        GroupShortCut,
+        BlockOfAnalysis,
         verbose_name=_("Analysis in Package"),
         related_name="%(app_label)s_%(class)s_Belng_To_Report",
     )
@@ -319,13 +319,13 @@ class Package(BaseModelName, GroupShortCut):
         verbose_name_plural = _("Packages")
 
 
-class Report(BaseModelName, GroupShortCut):
+class Report(BaseModelName, BlockOfAnalysis):
     class Meta:
         verbose_name = _("Report")
         verbose_name_plural = _("Reports")
 
 
-class Function(BaseModelName, GroupShortCut):
+class Function(BaseModelName, BlockOfAnalysis):
     belong_to_report = models.ForeignKey(
         Report,
         verbose_name=_("Belng To Report"),
@@ -338,7 +338,7 @@ class Function(BaseModelName, GroupShortCut):
         verbose_name_plural = _("Functions")
 
 
-class GroupAnalysis(BaseModelName, GroupShortCut):
+class GroupAnalysis(BaseModelName, BlockOfAnalysis):
     belong_to_function = models.ForeignKey(
         Function,
         verbose_name=_("Belng To Function"),
@@ -424,7 +424,7 @@ class NormalRange:
         verbose_name_plural = _("Normal Ranges")
 
 
-class Analysis(GroupShortCut):
+class Analysis(BlockOfAnalysis):
     sample_parameter = models.ForeignKey(
         SampleParameter,
         on_delete=models.CASCADE,
@@ -498,7 +498,7 @@ class MainLabMenu(models.Model):
         Sunday = "Sunday"
 
     analysis_shortCut = models.ForeignKey(
-        GroupShortCut,
+        BlockOfAnalysis,
         on_delete=models.CASCADE,
         verbose_name=_("Analysis ShortCut"),
     )
@@ -682,6 +682,7 @@ class VitalSign(BaseModelName):
     temperature in ti
     vital and sign* in ti
     observation* in ti.
+    fasting. / postprandial
 
     حيوية وعلامة *
     المريض والمراقبة *
@@ -703,6 +704,7 @@ class VitalSign(BaseModelName):
     درجة الحرارة في تي
     الحيوية وتسجيل الدخول ti
     المراقبة * في ti
+    صاءم او فاطر
     """
 
     class Meta:
@@ -711,6 +713,7 @@ class VitalSign(BaseModelName):
 
 
 class Run(models.Model):
+    start = models.DateTimeField(auto_now_add=True, verbose_name=_(""))
     def __str__(self):
         return str(self.id)
 
@@ -725,7 +728,7 @@ class Run(models.Model):
 
 class Visit(BaseModel):
     # TODO BarCode QR FEILD
-    qr = QRField()
+    qr = QRField(verbose_name=_("Visit QR"))
     # qr = models.UUIDField(
     #     primary_key=True,
     #     default=uuid.uuid4,
@@ -755,20 +758,26 @@ class Visit(BaseModel):
         blank=True,
         null=True,
     )
-    vitalSigns = models.ManyToManyField(
+    visit_patient_vitalSigns = models.ManyToManyField(
         VitalSign,
         through="VisitPatientVitalSign",
-        verbose_name=_("Vital Signs"),
+        verbose_name=_("Visit Patient Vital Signs"),
     )
-    required_group_shortCut = models.ManyToManyField(
-        GroupShortCut,
-        through="RequiredGroupShortCut",
-        verbose_name=_("Required Group ShortCut"),
-        related_name=_("%(app_label)s_%(class)s_Required_Group_ShortCut"),
+    Required_blocks_of_analysis = models.ManyToManyField(
+        BlockOfAnalysis,
+        through="VisitBlockOfAnalysis",
+        verbose_name=_("Required Blocks Of Analysis"),
+        related_name=_("%(app_label)s_%(class)s_Blocks_Of_Analysis"),
     )
+    # run = models.ManyToManyField(
+    #     Run,
+    #     through="VisitBlockOfAnalysis",
+    #     verbose_name=_("Run"),
+    #     related_name=_("%(app_label)s_%(class)s_Run"),
+    # )
 
     # TODO Employee Activity
-    lab_employee = models.ManyToManyField(
+    lab_employee_activity = models.ManyToManyField(
         LabEmployee,
         through="LabEmployeeActivity",
         verbose_name=_("Lab Employee Activity"),
@@ -793,35 +802,41 @@ class Visit(BaseModel):
 
 
 ############################################################################################################################################
-class RequiredGroupShortCut(models.Model):
+class VisitBlockOfAnalysis(models.Model):
     visit = models.ForeignKey(
         Visit,
         on_delete=models.CASCADE,
         verbose_name=_("Visit"),
         related_name=_("%(app_label)s_%(class)s_Visit"),
     )
-    group_shortCut = models.ForeignKey(
-        GroupShortCut,
+    block_of_analysis = models.ForeignKey(
+        BlockOfAnalysis,
         on_delete=models.CASCADE,
-        verbose_name=_("Group ShortCut"),
-        related_name=_("%(app_label)s_%(class)s_GroupShortCut"),
+        verbose_name=_("Block Of Analysis"),
+        related_name=_("%(app_label)s_%(class)s_Block_Of_Analysis"),
+    )
+    run = models.ForeignKey(
+        Run,
+        on_delete=models.CASCADE,
+        verbose_name=_("Run"),
+        related_name=_("%(app_label)s_%(class)s_Run"),
     )
 
     def __str__(self):
-        return f"{str(self.visit)}->{str(self.group_shortCut)}"
+        return f"{str(self.visit)}->{str(self.block_of_analysis)}"
 
     @property
     def slug(self):
         return slugify(self.__str__)
 
     class Meta:
-        unique_together = [["visit", "group_shortCut"]]
-        verbose_name = _("Required Analysis")
-        verbose_name_plural = _("Required Analysis")
+        unique_together = [["visit", "block_of_analysis"]]
+        verbose_name = _("Visit Block Of Analysis")
+        verbose_name_plural = _("Visits Blocks Of Analysis")
 
 
 ############################################################################################################################################
-class RequiredReport(models.Model):
+class VisitReport(models.Model):
     visit = models.ForeignKey(
         Visit,
         on_delete=models.CASCADE,
@@ -829,44 +844,92 @@ class RequiredReport(models.Model):
         related_name=_("%(app_label)s_%(class)s_Visit"),
     )
     report = models.ForeignKey(
-        GroupShortCut,
+        Report,
         on_delete=models.CASCADE,
-        verbose_name=_("Group ShortCut"),
-        related_name=_("%(app_label)s_%(class)s_GroupShortCut"),
+        verbose_name=_("Report"),
+        related_name=_("%(app_label)s_%(class)s_Report"),
+    )
+    group_in_visit_report = models.ManyToManyField(
+        GroupAnalysis,
+        through="Group In Visit Report",
+        verbose_name=_("Group In Visit Report"),
+        related_name=_("%(app_label)s_%(class)s_Group_In_Visit_Report"),
     )
 
     def __str__(self):
-        return f"{str(self.visit)}->{str(self.group_shortCut)}"
+        return f"{str(self.visit)}->{str(self.report)}"
 
     @property
     def slug(self):
-        return slugify(f"{str(self.visit)}->{str(self.group_shortCut)}")
+        return slugify(self.__str__)
 
     class Meta:
-        unique_together = [["visit", "group_shortCut"]]
-        verbose_name = _("Required Report")
-        verbose_name_plural = _("Required Reports")
+        unique_together = [["visit", "report"]]
+        verbose_name = _("Visit Report")
+        verbose_name_plural = _("Visits Reports")
 
 
-class GroupInRequiredReport(models.Model):
-    pass
-    """
-        RequiredReport
-        group
+class GroupInVisitReport(models.Model):
+    visit_report = models.ForeignKey(
+        VisitReport,
+        on_delete=models.CASCADE,
+        verbose_name=_("VisitReport"),
+        related_name=_("%(app_label)s_%(class)s_VisitReport"),
+    )
+    group_analysis = models.ForeignKey(
+        GroupAnalysis,
+        on_delete=models.CASCADE,
+        verbose_name=_("Group Analysis"),
+        related_name=_("%(app_label)s_%(class)s_Group_Analysis"),
+    )
+    line_in_report = models.ManyToManyField(
+        Analysis,
+        through="LineInReport",
+        verbose_name=_("Line In Report"),
+        related_name=_("%(app_label)s_%(class)s_Line_In_Report"),
+    )
 
-    """
+    def __str__(self):
+        return f"{str(self.visit_report)}->{str(self.group_analysis)}"
+
+    @property
+    def slug(self):
+        return slugify(self.__str__)
+
+    class Meta:
+        unique_together = [["visit_report", "group_analysis"]]
+        verbose_name = _("Group In Report")
+        verbose_name_plural = _("Groups In Reports")
 
 
-class LineInGroup(models.Model):
-    pass
-    """
-        GroupInRequiredReport
-        sample_paramter
-        result
-        high | low
-        normal range
+class LineInReport(models.Model):
+    group_in_report = models.ForeignKey(
+        GroupInVisitReport,
+        on_delete=models.CASCADE,
+        verbose_name=_("Group In Report"),
+        related_name=_("%(app_label)s_%(class)s_Group_In_Report"),
+    )
+    analysis = models.ForeignKey(
+        Analysis,
+        on_delete=models.CASCADE,
+        verbose_name=_("Analysis"),
+        related_name=_("%(app_label)s_%(class)s_Analysis"),
+    )
+    value = 
+    unit = 
+    normal_range = 
 
-    """
+    def __str__(self):
+        return f"{str(self.group_in_report)}->{str(self.analysis)}"
+
+    @property
+    def slug(self):
+        return slugify(self.__str__)
+
+    class Meta:
+        unique_together = [["group_in_report", "analysis"]]
+        verbose_name = _("Line In Report")
+        verbose_name_plural = _("Lines In Reports")
 
 
 ############################################################################################################################################
@@ -926,7 +989,7 @@ class LabEmployeeActivity(models.Model):
         verbose_name=_("Activity"),
     )
     execution_time = models.DateTimeField(
-        auto_now=True,
+        auto_now_add=True,
         verbose_name=_("Execution Time"),
     )
 
