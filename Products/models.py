@@ -1,6 +1,6 @@
 from django.db import models
 from polymorphic.models import PolymorphicModel
-from GraphQL.models import BaseModel, BaseModelName
+from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
 from Location.models import Country
 from Facilities.models import Compony
 from Persons.models import Customer, Employee
@@ -65,17 +65,11 @@ class UnitConvert(models.Model):
         verbose_name_plural = _("Unit Converts")
 
 
-class Brand(BaseModelName):
+class Brand(BaseModelLogo):
     made_in = models.ForeignKey(
         Country,
         on_delete=models.CASCADE,
         verbose_name=_("Made In"),
-    )
-    logo_url = models.CharField(
-        max_length=100,
-        null=True,
-        blank=True,
-        verbose_name=_("Logo URL"),
     )
 
     class Meta:
@@ -111,7 +105,7 @@ class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
         verbose_name=_("Brand"),
     )
     image_url = models.ImageField(
-        upload_to="images",
+        upload_to="images/Products/",
         verbose_name=_("Image URL"),
     )
     serial = models.CharField(
