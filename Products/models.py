@@ -95,7 +95,7 @@ class SubCategory(BaseModelName):
         verbose_name_plural = _("Sub Categorys")
 
 
-class Product(PolymorphicModel, BaseModelName, BaseModel):  # Weak Entity
+class Product(PolymorphicModel, BaseModelName):  # Weak Entity
     class Packing(models.TextChoices):
         Package = "Package"
 

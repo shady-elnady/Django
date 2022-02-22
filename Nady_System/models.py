@@ -4,7 +4,7 @@ from GraphQL.models import BaseModel, BaseModelName
 from polymorphic.models import PolymorphicModel
 from Facilities.models import Branch, MainLab
 from Persons.models import Doctor, LabEmployee, NREntity, Patient
-from Products.models import LineInInvoice, Product, Unit
+from Products.models import Brand, LineInInvoice, Product, Unit
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from GraphQL.custom_fields import QRField
@@ -52,6 +52,12 @@ class TechniqueMethod(BaseModelName):
         verbose_name_plural = _("Technique Methods")
 
 
+class ShortCut(BaseModelName):
+    class Meta:
+        verbose_name = _("ShortCut")
+        verbose_name_plural = _("ShortCuts")
+
+
 # TODO Duration Sample
 class Sample(BaseModelName):
     class Action(models.TextChoices):
@@ -84,12 +90,123 @@ class MedicalSupply(Product):
         verbose_name = _("Medical Supply")
         verbose_name_plural = _("Medical Supplies")
 
-        
+
+class Parameter(PolymorphicModel, BaseModelName):
+    
+    shortCuts = models.ManyToManyField(
+        ShortCut,
+        verbose_name=_("ShortCuts"),
+        related_name="%(app_label)s_%(class)s_ShortCuts",
+    )
+    used_units = models.ManyToManyField(
+        Unit,
+        through="ParameterUnit",
+        verbose_name=_("Used Units"),
+    )
+    molecular_weight = models.SmallIntegerField()
+
+    class Meta:
+        verbose_name = _("Parameter")
+        verbose_name_plural = _("Parameters")
+
+
 class Kat(Product):
+    parameters = models.ManyToManyField(
+        Parameter,
+        through="KatParameter",
+        verbose_name=_("Parameters"),
+        related_name="%(app_label)s_%(class)s_Parameters",
+    )
     
     class Meta:
         verbose_name = _("Kat")
         verbose_name_plural = _("Kats")
+
+
+class Standard(models.Model):
+    serial = models.CharField(max_length=20, primary_key=True, verbose_name=_("Serial No."),)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name=_("Brand"), related_name="%(app_label)s_%(class)s_Brand",)
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
+    concentration = models.DecimalField(max_digits=3, decimal_places=2, verbose_name=_("Concentration"),)
+
+    def __str__(self):
+        return f"{str(self.brand)}->{str(self.parameter)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        verbose_name = _("Standard")
+        verbose_name_plural = _("Standards")
+
+
+class KatParameter(models.Model):
+    kat = models.ForeignKey(
+        Kat,
+        on_delete=models.CASCADE,
+        verbose_name=_("Kat"),
+        related_name="%(app_label)s_%(class)s_Kat",
+    )
+    parameter = models.ForeignKey(
+        Parameter,
+        on_delete=models.CASCADE,
+        verbose_name=_("Parameter"),
+        related_name="%(app_label)s_%(class)s_Parameter",
+    )
+    samples = models.ManyToManyField(
+        Sample,
+        through="SampleKatParameter",
+        verbose_name=_("Samples"),
+        related_name="%(app_label)s_%(class)s_Samples",
+    )
+    used_unit = models.ForeignKey(
+        Unit,
+        on_delete=models.CASCADE,
+        verbose_name=_("Used Unit"),
+        related_name="%(app_label)s_%(class)s_Used_Unit",
+    )
+    normal_range = 
+
+    def __str__(self):
+        return f"{str(self.kat)}->{str(self.parameter)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        unique_together = [["kat", "parameter"]]
+        verbose_name = _("Kat Parameter")
+        verbose_name_plural = _("Kat Parameters")
+
+
+class SampleKatParameter(models.Model):
+    kat_parameter = models.ForeignKey(
+        KatParameter,
+        on_delete=models.CASCADE,
+        verbose_name=_("Kat Parameter"),
+        related_name="%(app_label)s_%(class)s_Kat_Parameter",
+    )
+    sample = models.ForeignKey(
+        Sample,
+        on_delete=models.CASCADE,
+        verbose_name=_("Sample"),
+        related_name="%(app_label)s_%(class)s_Sample",
+    )
+    is_favorite = models.BooleanField(default=True, verbose_name=_("Is favorite"),)
+
+    def __str__(self):
+        return f"{str(self.kat_parameter)}->{str(self.sample)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        unique_together = [["kat_parameter", "sample"]]
+        verbose_name = _("Sample Kat Parameter")
+        verbose_name_plural = _("Sample Kat Parameters")
 
 
 class Analyzer(Product):
@@ -122,25 +239,25 @@ class Analyzer(Product):
         verbose_name_plural = _("Analyzers")
 
 
-class ClosedAnalyzer(Analyzer):
-    kats = models.ManyToManyField(Kat , verbose_name=_("Kats"), through="KatAnalyzer",related_name="%(app_label)s_%(class)s_Kats",)
+class ClosedSystemAnalyzer(Analyzer):
+    kats = models.ManyToManyField(Kat , verbose_name=_("Kats"), through="KatClosedSystemAnalyzer",related_name="%(app_label)s_%(class)s_Kats",)
 
     class Meta:
-        verbose_name = _("ClosedAnalyzer")
-        verbose_name_plural = _("ClosedAnalyzers")
+        verbose_name = _("Closed System Analyzer")
+        verbose_name_plural = _("Closed System Analyzers")
 
 
-class KatClosedAnalyzer(models.Model):
+class KatClosedSystemAnalyzer(models.Model):
+    closed_system_analyzer = models.ForeignKey(ClosedSystemAnalyzer, on_delete=models.CASCADE, verbose_name=_("Closed System Analyzer"), related_name="%(app_label)s_%(class)s_Closed_System_Analyzer",)
     kat = models.ForeignKey(Kat, on_delete=models.CASCADE, verbose_name=_("Kat"), related_name="%(app_label)s_%(class)s_Kat",)
-    closed_analyzer = models.ForeignKey(ClosedAnalyzer, on_delete=models.CASCADE, verbose_name=_("Closed Analyzer"), related_name="%(app_label)s_%(class)s_Closed_Analyzer",)
     start_up_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("Start Up Consumption"),) # استهلاك الكيمويات فى فتح الجهاز
     test_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("Test Consumption"),) # استهلاك الكيمويات لتحليل
     end_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("End Consumption"),) # استهلاك الكيمويات فى غلق الجهاز
     
     class Meta:
-        unique_together = [["kat", "closed_analyzer"]]
-        verbose_name = _("Kat ClosedAnalyzer")
-        verbose_name_plural = _("Kats ClosedAnalyzers")
+        unique_together = [["closed_system_analyzer", "kat", ]]
+        verbose_name = _("Kat Closed System Analyzer")
+        verbose_name_plural = _("Kat Closed System Analyzers")
 
 
 # NOTE Bind with Medicin
@@ -163,29 +280,44 @@ class DisksAntiBiotic(Kat):
         verbose_name_plural = _("Disks Anti-Biotics")
 
 
-class ShortCut(BaseModelName):
+class CalculatedParameter(Parameter):
+    equation_parameter = models.ManyToManyField(Parameter, verbose_name=_("Equation Parameter"), through="EquationParameter", related_name="%(app_label)s_%(class)s_Equation_Parameter",)
+    equation = models.CharField(max_length=20, verbose_name=_("Equation"),)
+    
     class Meta:
-        verbose_name = _("ShortCut")
-        verbose_name_plural = _("ShortCuts")
+        verbose_name = _("Calculated Parameter")
+        verbose_name_plural = _("Calculated Parameters")
 
 
-class Parameter(BaseModelName):
+class EquationParameter(models.Model):
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
+    related_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Related Parameter"), related_name="%(app_label)s_%(class)s_Related_Parameter",)
+    symbol_in_equation = models.CharField(max_length=1, verbose_name=_("Symbol in Equation"))
+
+    def __str__(self):
+        return f"{str(self.parameter)}->{str(self.related_parameter)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        uniqe_together = [["parameter", "related_parameter"]]
+        verbose_name = _("Equation Parameter")
+        verbose_name_plural = _("Equation Parameters")
+
+
+class RunedParameter(Parameter):
     samples = models.ManyToManyField(
         Sample,
         through="SampleParameter",
         symmetrical=False,
         verbose_name=_("Samples"),
     )
-    units = models.ManyToManyField(
-        Unit,
-        through="ParameterUnit",
-        symmetrical=False,
-        verbose_name=_("Units"),
-    )
 
     class Meta:
-        verbose_name = _("Parameter")
-        verbose_name_plural = _("Parameters")
+        verbose_name = _("Runed Parameter")
+        verbose_name_plural = _("Runed Parameters")
 
 
 class ParameterUnit(models.Model):
