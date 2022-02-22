@@ -8,7 +8,7 @@ from Products.models import Brand, LineInInvoice, Product, Unit
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from GraphQL.custom_fields import QRField
-import uuid
+# import uuid
 
 
 # Create your models here.
@@ -20,7 +20,8 @@ class Stock(BaseModel):  # المخزون
         on_delete=models.CASCADE,
         verbose_name=_("Product"),
     )
-    produuct_details = models.ManyToManyField(
+    # TODO PRODUCT DEATAILS STOCK
+    product_details = models.ManyToManyField(
         LineInInvoice,
         on_delete=models.CASCADE,
         verbose_name=_("Product Details"),
@@ -33,7 +34,7 @@ class Stock(BaseModel):  # المخزون
 
     @property  # inventory  المخزون
     def stock(self):
-        return sum(list(map(lambda x: x["count_packing"], self.details)))
+        return sum(list(map(lambda x: x["count_packing"], self.product_details)))
 
     class Meta:
         verbose_name = _("Stock")
@@ -60,8 +61,10 @@ class ShortCut(BaseModelName):
 
 # TODO Duration Sample
 class Sample(BaseModelName):
+    
     class Action(models.TextChoices):
         Prandial = "Prandial"
+        
     comment = models.TextField(
         max_length=200,
         verbose_name=_("Comment"),
@@ -103,7 +106,7 @@ class Parameter(PolymorphicModel, BaseModelName):
         through="ParameterUnit",
         verbose_name=_("Used Units"),
     )
-    molecular_weight = models.SmallIntegerField()
+    molecular_weight = models.SmallIntegerField(blank=True, null=True, verbose_name=_("Molecular Weught"))
 
     class Meta:
         verbose_name = _("Parameter")

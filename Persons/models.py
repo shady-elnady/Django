@@ -20,9 +20,26 @@ class NREntity(PolymorphicModel):
     class Meta:
         verbose_name = _("Normal Range Entity")
         verbose_name_plural = _("Normal Range Entities")
+        
+        
+class QualitativeNormalRange(NREntity):
+    class Qualitative(models.TextChoices):
+        Negative = "Negative"
+        Equivocal = "Equivocal"
+        Positive = "Positive"
+    qualitative_normal_range = models.CharField(max_length=15, verbose_name=_("Qualitative Normal Rnage"), choices=Qualitative.choices,)
+    class Meta:
+        verbose_name = _("Qualitative Normal Range")
+        verbose_name_plural = _("Qualitative Normal Ranges")
+        
+        
+class QuantitativeNormalRange(NREntity, BaseModelName):
+    class Meta:
+        verbose_name = _("Quantitative Normal Range")
+        verbose_name_plural = _("Quantitative Normal Ranges")
 
 
-class StageLife(NREntity, BaseModelName):
+class StageLife(QuantitativeNormalRange):
     start_from_age = models.DurationField(verbose_name=_("Start from Age"))
     end_to_age = models.DurationField(verbose_name=_("End to Age"))
 
@@ -51,7 +68,7 @@ class MaritalStatus(BaseModelName):
         verbose_name_plural = _("Marital Status")
 
 
-class Gender(NREntity, BaseModelName):
+class Gender(QuantitativeNormalRange):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
 
