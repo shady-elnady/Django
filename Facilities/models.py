@@ -1,18 +1,14 @@
 from django.db import models
-
-# from djongo.models import ArrayReferenceField
-# from Persons.models import Person, Pharmacist
-from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
-from polymorphic.models import PolymorphicModel
 from django.utils.translation import gettext_lazy as _
 
+from polymorphic.models import PolymorphicModel
+from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
 from Location.models import Caller
-
 
 # Create your models here.
 
 
-class Job(PolymorphicModel, BaseModelName):
+class Job(BaseModelName):
     class Meta:
         verbose_name = _("Job")
         verbose_name_plural = _("Jobs")
@@ -21,11 +17,51 @@ class Job(PolymorphicModel, BaseModelName):
     #     return reverse("_detail", kwargs={"pk": self.pk})
 
 
+class FacilityType(BaseModelName):
+    class Meta:
+        verbose_name = _("Facility Type")
+        verbose_name_plural = _("Facilities Types")
+
+
 class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
     owner = models.ForeignKey(
         to="Persons.Person",
         on_delete=models.CASCADE,
         verbose_name=_("Owner"),
+    )
+    facility_type = models.ForeignKey(
+        FacilityType,
+        on_delete=models.CASCADE,
+        verbose_name=_("Facility Type"),
+        related_name="%(app_label)s_%(class)s_Facility_Type",
+    )
+
+    class Meta:
+        verbose_name = _("Facility")
+        verbose_name_plural = _("Facilities")
+
+
+class Store(BaseModelName):  # مخازن
+
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_facility",
+        verbose_name=_("Facility"),
+    )
+
+    class Meta:
+        verbose_name = _("Store")
+        verbose_name_plural = _("Stores")
+
+
+class Branch(BaseModelName, BaseModel):
+
+    facility = models.ForeignKey(
+        Facility,
+        on_delete=models.CASCADE,
+        related_name="%(app_label)s_%(class)s_facility",
+        verbose_name=_("Facility"),
     )
     caller = models.ForeignKey(
         Caller,
@@ -35,50 +71,18 @@ class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
     )
 
     class Meta:
-        verbose_name = _("Facility")
-        verbose_name_plural = _("Facilities")
-
-
-class Store(Facility):  # مخازن
-    class Meta:
-        verbose_name = _("Store")
-        verbose_name_plural = _("Stores")
-
-
-class Branch(BaseModelName, BaseModel):
-    # TODO ADRESS TELPHONE LOCATION
-    facility = models.ForeignKey(
-        Facility,
-        on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_facility",
-        verbose_name=_("Facility"),
-    )
-    store = models.ForeignKey(
-        Store,
-        on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_store",
-        verbose_name=_("Store"),
-    )
-
-    class Meta:
         verbose_name = _("Branch")
         verbose_name_plural = _("Branchs")
 
 
 class MobileNetWork(Facility):  # شركات محمول
-    tel_code = models.CharField(
+
+    telephone_code = models.CharField(
         max_length=5,
         blank=True,
         null=True,
         unique=True,
-        verbose_name=_("Tel Code"),
-    )
-    emoji = models.CharField(
-        max_length=5,
-        blank=True,
-        null=True,
-        unique=True,
-        verbose_name=_("Emoji"),
+        verbose_name=_("Telephone Code"),
     )
 
     class Meta:
@@ -86,6 +90,20 @@ class MobileNetWork(Facility):  # شركات محمول
         verbose_name_plural = _("Mobile NetWorks")
 
 
+class MedicalFacility(Facility):  # منشأه طبيه
+    technical_supervisor = models.ForeignKey(
+        to="Persons.Person",
+        on_delete=models.CASCADE,
+        verbose_name=_("Technical Supervisor"),
+    )
+
+    class Meta:
+        verbose_name = _("Medical Facility")
+        verbose_name_plural = _("Medical Facilities")
+
+
+
+"""
 class Compony(Facility):  # شركات
     class Meta:
         verbose_name = _("Compony")
@@ -110,18 +128,6 @@ class Supplier(Compony):
         verbose_name_plural = _("Suppliers")
 
     # brands = ArrayReferenceField(to=Brand, on_delete=models.CASCADE)
-
-
-class MedicalFacility(Facility):  # منشأه طبيه
-    technical_supervisor = models.ForeignKey(
-        to="Persons.Pharmacist",
-        on_delete=models.CASCADE,
-        verbose_name=_("Technical Supervisor"),
-    )
-
-    class Meta:
-        verbose_name = _("Medical Facility")
-        verbose_name_plural = _("Medical Facilities")
 
 
 class Pharmacy(MedicalFacility):  # صيدليات
@@ -224,3 +230,4 @@ class LabJob(Job):
     class Meta:
         verbose_name = _("Laboratory Job")
         verbose_name_plural = _("Laboratory Jobs")
+"""

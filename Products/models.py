@@ -143,6 +143,12 @@ class Product(PolymorphicModel, BaseModelName):  # Weak Entity
         verbose_name_plural = _("Products")
 
 
+class MedicalSupply(Product):
+    class Meta:
+        verbose_name = _("Medical Supply")
+        verbose_name_plural = _("Medical Supplies")
+
+
 class Invoice(models.Model):
     products = models.ManyToManyField(
         Product,

@@ -91,8 +91,8 @@ INSTALLED_APPS = [
     "Languages",
     "Libraries",
     "Utils",
-    "Location",
     "Payment",  # ماليات
+    "Location",
     "Facilities",  # منشآت
     "Persons",
     "Products",

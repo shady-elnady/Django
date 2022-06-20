@@ -34,7 +34,7 @@ class BaseModelName(models.Model):
     def slug(self):
         return slugify(self.name)
 
-    def __str__(self) -> str:
+    def __str__(self):
         return self.name
 
     class Meta:

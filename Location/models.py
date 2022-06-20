@@ -2,12 +2,14 @@ from django.db import models
 from django.forms import CharField
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
+from countries_plus.models import Country as _Country
 
 # from django.utils.text import slugify
 from djongo.models import ArrayField
 from timezone_field import TimeZoneField
-from Facilities.models import MobileNetWork
-from GraphQL.models import BaseModelLogo, BaseModelNative
+
+# from Facilities.models import MobileNetWork
+from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
 from Payment.models import Currency
 from Languages.models import Language
 
@@ -38,14 +40,17 @@ class Continent(models.Model):
         verbose_name_plural = _("Continents")
 
 
-class Country(BaseModelNative):
+class Country(BaseModel, _Country):
+    ## https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
 
     continents = ArrayField(
         model_container=Continent,
         verbose_name=_("Continents"),
     )
-    capital = models.CharField(
-        max_length=20,
+    capital = models.ForeignKey(
+        to="City",
+        related_name="%(app_label)s_%(class)s_Capital",
+        on_delete=models.CASCADE,
         verbose_name=_("Capital"),
     )
     flag = models.CharField(
@@ -66,34 +71,79 @@ class Country(BaseModelNative):
         default="Africa/Cairo",
         verbose_name=_("Time Zone"),
     )
-    currencies = ArrayField(
-        model_container=Currency,
-        verbose_name=_("Currencies"),
+    currency = models.ForeignKey(
+        Currency,
+        related_name="%(app_label)s_%(class)s_Currency",
+        on_delete=models.CASCADE,
+        verbose_name=_("Currency"),
     )
     languages = ArrayField(
         model_container=Language,
-        verbose_name=_("Currencies"),
+        verbose_name=_("languages"),
     )
-    Tel_code = models.CharField(
+    phone = models.CharField(
         max_length=3,
         verbose_name=_("Telphone Code"),
     )
+
+    @property
+    def continent(self):
+        return self.continent[0]
+
+    @property
+    def currency_code(self):
+        return self.currency.code
+
+    @property
+    def currency_name(self):
+        return self.currency.name
+
+    @property
+    def currency_symbol(self):
+        return self.currency.symbol
 
     class Meta:
         verbose_name = _("Country")
         verbose_name_plural = _("Countries")
 
-    # def get_absolute_url(self):
-    #     return reverse("_detail", kwargs={"pk": self.pk})
+        # def get_absolute_url(self):
+        #     return reverse("_detail", kwargs={"pk": self.pk})
+        """_summary_
+
+            iso (ISO)
+            iso3 (ISO3)
+            iso_numeric (ISO-Numeric)
+            fips (fips)
+            name (Country)
+            capital
+            area (Area(in sq km))
+            population (population)
+            continent (continent)
+            tld (tld)
+            currency_code (CurrencyCode)
+            currency_name (CurrencyName)
+            currency_symbol (Not part of the original table)
+            phone (Phone)
+            postal_code_format (Postal Code Format)
+            postal_code_regex (Postal Code Regex)
+            languages (Languages)
+            geonameid (geonameid)
+            neighbors (neighbours)
+            equivalent_fips_code (EquivalentFipsCode)
+
+        Returns:
+            _type_: _description_
+        """
 
 
-class Province(BaseModelNative):  # المحافظه
-    tel_code = models.CharField(
+class Subdivision(BaseModelNative):  # المحافظه
+    ## https://en.wikipedia.org/wiki/ISO_3166-2:EG
+    telephone_code = models.CharField(
         max_length=3,
         blank=True,
         null=True,
         unique=True,
-        verbose_name=_("Telphone Code"),
+        verbose_name=_("Telephone Code"),
     )
     country = models.ForeignKey(
         Country,
@@ -102,15 +152,15 @@ class Province(BaseModelNative):  # المحافظه
     )
 
     class Meta:
-        verbose_name = _("Province")
-        verbose_name_plural = _("Provinces")
+        verbose_name = _("Subdivision")
+        verbose_name_plural = _("Subdivisions")
 
 
 class City(BaseModelNative):
-    province = models.ForeignKey(
-        Province,
+    subdivision = models.ForeignKey(
+        Subdivision,
         on_delete=models.CASCADE,
-        verbose_name=_("Province"),
+        verbose_name=_("Subdivision"),
     )
 
     class Meta:
@@ -142,9 +192,9 @@ class Street(BaseModelNative):
         verbose_name_plural = _("Streets")
 
 
-class WayCommunicate(PolymorphicModel):
+class WayCommunicate(BaseModel, PolymorphicModel):
     owner = models.ForeignKey(
-        "Persons.Person",
+        to="Persons.Person",
         on_delete=models.CASCADE,
         verbose_name=_("Owner"),
         related_name="%(app_label)s_%(class)s_Owner",
@@ -191,17 +241,19 @@ class Phone(WayCommunicate):
 
 
 class Mobile(Phone):
-    mobile_netWork_code = models.ForeignKey(
-        MobileNetWork,
-        to_field="tel_code",
+    netWork_code = models.ForeignKey(
+        to="Facilities.MobileNetWork",
+        to_field="telephone_code",
         on_delete=models.CASCADE,
-        verbose_name=_("Mobile NetWork Code"),
-        related_name="%(app_label)s_%(class)s_Mobile_NetWork_Code",
+        verbose_name=_("NetWork Code"),
+        related_name="%(app_label)s_%(class)s_NetWork_Code",
     )
 
     @property
     def number(self):
-        return f"{str(self.country_code)}{str(self.mobile_netWork_code)}{str(self.rest_number)}"
+        return (
+            f"{str(self.country_code)}{str(self.netWork_code)}{str(self.rest_number)}"
+        )
 
     class Meta:
         verbose_name = _("Mobile")
@@ -209,26 +261,24 @@ class Mobile(Phone):
 
 
 class LandPhone(Phone):
-    province_code = models.ForeignKey(
-        Province,
-        to_field="tel_code",
+    subdivision_code = models.ForeignKey(
+        Subdivision,
+        to_field="telephone_code",
         on_delete=models.CASCADE,
-        verbose_name=_("Province Code"),
-        related_name="%(app_label)s_%(class)s_Province_Code",
+        verbose_name=_("Subdivision Code"),
+        related_name="%(app_label)s_%(class)s_Subdivision_Code",
     )
 
     @property
     def number(self):
-        return (
-            f"{str(self.country_code)}{str(self.province_code)}{str(self.rest_number)}"
-        )
+        return f"{str(self.country_code)}{str(self.subdivision_code)}{str(self.rest_number)}"
 
     class Meta:
         verbose_name = _("Land Phone")
         verbose_name_plural = _("Land Phones")
 
 
-class SocialMedia(BaseModelLogo, WayCommunicate):
+class SocialMedia(BaseModelName, WayCommunicate):
     mobile = models.ForeignKey(
         Mobile,
         on_delete=models.CASCADE,

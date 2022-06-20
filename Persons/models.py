@@ -1,117 +1,56 @@
+# from unicodedata import category as _category
 from django.db import models  # from django.db.models import Model, ForeignKey, CASCADE
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from datetime import date
+import calendar
+
 from .managers import FollowingManager, UsersManager
 from GraphQL.models import BaseModel, BaseModelName
-from Facilities.models import Branch, Department, Job
+from Facilities.models import Branch, Job
 from polymorphic.models import PolymorphicModel
 from djongo.models import ArrayReferenceField
 from Languages.models import Language
 from Location.models import Caller
-from datetime import date
-import calendar
 
 
 # Create your models here.
 
 
-class NREntity(PolymorphicModel):
-    class Meta:
-        verbose_name = _("Normal Range Entity")
-        verbose_name_plural = _("Normal Range Entities")
-        
-        
-class QualitativeNormalRange(NREntity):
-    class Qualitative(models.TextChoices):
-        Negative = "Negative"
-        Equivocal = "Equivocal"
-        Positive = "Positive"
-    qualitative_normal_range = models.CharField(max_length=15, verbose_name=_("Qualitative Normal Rnage"), choices=Qualitative.choices,)
-    class Meta:
-        verbose_name = _("Qualitative Normal Range")
-        verbose_name_plural = _("Qualitative Normal Ranges")
-        
-        
-class QuantitativeNormalRange(NREntity, BaseModelName):
-    class Meta:
-        verbose_name = _("Quantitative Normal Range")
-        verbose_name_plural = _("Quantitative Normal Ranges")
-
-
-class StageLife(QuantitativeNormalRange):
-    start_from_age = models.DurationField(verbose_name=_("Start from Age"))
-    end_to_age = models.DurationField(verbose_name=_("End to Age"))
-
-    @property
-    def slug(self):
-        return slugify(self.name)
+class ReferenceLimitingFactor(PolymorphicModel, BaseModelName):
+    category = models.ForeignKey(
+        "self",
+        on_delete=models.CASCADE,
+        verbose_name=_("Category"),
+        related_name="%(app_label)s_%(class)s_Category",
+    )
 
     class Meta:
-        verbose_name = _("Stage Life")
-        verbose_name_plural = _("Stage Lifes")
-
-    # def get_absolute_url(self):
-    #     return reverse("_detail", kwargs={"pk": self.pk})
+        verbose_name = _("Reference Limiting Factor")
+        verbose_name_plural = _("Reference Limiting Factors")
 
 
 class MaritalStatus(BaseModelName):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
 
-    @property
-    def slug(self):
-        return slugify(self.name)
-
     class Meta:
         verbose_name = _("Marital Status")
         verbose_name_plural = _("Marital Status")
 
 
-class Gender(QuantitativeNormalRange):
+class Gender(ReferenceLimitingFactor):
     emoji = models.CharField(max_length=5, blank=True, null=True, unique=True)
     is_active = models.BooleanField(default=False)
-
-    @property
-    def slug(self):
-        return slugify(self.name)
 
     class Meta:
         verbose_name = _("Gender")
         verbose_name_plural = _("Genders")
 
 
-class Title(BaseModelName):
-    stage_life = models.ForeignKey(
-        StageLife,
-        on_delete=models.CASCADE,
-    )
-    gender = models.ForeignKey(
-        Gender,
-        on_delete=models.CASCADE,
-    )
-    job = models.ForeignKey(
-        Job,
-        on_delete=models.CASCADE,
-        blank=True,
-        null=True,
-    )
-
-    class Meta:
-        unique_together = (
-            "stage_life",
-            "job",
-            "gender",
-        )
-        verbose_name = _("Title")
-        verbose_name_plural = _("Titles")
-
-    @property
-    def slug(self):
-        return slugify(self.name)
-
-
 class Person(PolymorphicModel, BaseModel):
+
     national_id = models.CharField(
         max_length=14,
         unique=True,
@@ -137,7 +76,6 @@ class Person(PolymorphicModel, BaseModel):
         null=True,
         verbose_name=_("Birth Date"),
     )
-
     gender = models.ForeignKey(
         Gender,
         on_delete=models.CASCADE,
@@ -165,7 +103,6 @@ class Person(PolymorphicModel, BaseModel):
         symmetrical=True,
         verbose_name=_("Kinshipers"),
     )
-
     language = models.ForeignKey(
         Language,
         on_delete=models.SET_NULL,
@@ -174,17 +111,12 @@ class Person(PolymorphicModel, BaseModel):
         default="ar",
         verbose_name=_("Language"),
     )
-    # ADREESS E-MAIL
     caller = models.ForeignKey(
         Caller,
         on_delete=models.CASCADE,
         verbose_name=_("Caller"),
         related_name="%(app_label)s_%(class)s_Caller",
     )
-
-    @property
-    def title(self) -> str:
-        return Title.objects.get(name=self.job).name
 
     @property
     def age(self):
@@ -216,12 +148,12 @@ class Person(PolymorphicModel, BaseModel):
     def slug(self):
         return slugify(str(self.full_name))
 
+    def __str__(self):
+        return self.full_name
+
     class Meta:
         verbose_name = _("Person")
         verbose_name_plural = _("Persons")
-
-    def __str__(self):
-        return self.full_name
 
 
 class Kinship(models.Model):
@@ -242,6 +174,13 @@ class Kinship(models.Model):
         choices=kinshipRelations.choices,
     )
 
+    @property
+    def slug(self):
+        return slugify(str(self.person))
+
+    def __str__(self):
+        return f"{self.person} -> {self.kinshiper}"
+
     class Meta:
         unique_together = (
             "person",
@@ -250,34 +189,23 @@ class Kinship(models.Model):
         verbose_name = _("Kinship")
         verbose_name_plural = _("Kinships")
 
-    @property
-    def slug(self):
-        return slugify(str(self.full_name))
 
-    def __str__(self):
-        return self.full_name
-
-
-class Pharmacist(Person):  # صيدلي
-    class Meta:
-        verbose_name = _("Pharmacist")
-        verbose_name_plural = _("Pharmacists")
+# class Pharmacist(Person):  # صيدلي
+#     class Meta:
+#         verbose_name = _("Pharmacist")
+#         verbose_name_plural = _("Pharmacists")
 
 
-class Customer(Person):
-    class Meta:
-        verbose_name = _("Customer")
-        verbose_name_plural = _("Customers")
+# class Customer(Person):
+#     class Meta:
+#         verbose_name = _("Customer")
+#         verbose_name_plural = _("Customers")
 
 
 class Patient(Person):
     class Meta:
         verbose_name = _("Patient")
         verbose_name_plural = _("Patients")
-
-    # blood_group = models.ForeignKey(
-    #     BloodGroup, on_delete=models.CASCADE, blank=True, null=True,
-    # )
 
 
 # TODO Permission class Bind to MIXIN
@@ -288,6 +216,7 @@ class Permission(BaseModelName):
 
 
 class Employee(Person):
+
     branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
     salary = models.DecimalField(max_digits=5, decimal_places=2)
     attendance_time = models.TimeField()  # ميعاد الحضور

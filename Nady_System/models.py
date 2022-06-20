@@ -1,36 +1,40 @@
 from django.db import models
 from djongo.models import ArrayReferenceField
-from GraphQL.models import BaseModel, BaseModelName
 from polymorphic.models import PolymorphicModel
+from GraphQL.models import BaseModel, BaseModelName
 from Facilities.models import Branch, MainLab
-from Persons.models import Doctor, LabEmployee, NREntity, Patient
-from Products.models import Brand, LineInInvoice, Product, Unit
+from Persons.models import Doctor, Gender, LabEmployee, Patient
+from Products.models import Brand, LineInInvoice, MedicalSupply, Unit
 from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
 from GraphQL.custom_fields import QRField
-# import uuid
 
 
 # Create your models here.
 
+class LabSupply(MedicalSupply):
+    
+    class Meta:
+        verbose_name = _("Laboratory Supply")
+        verbose_name_plural = _("Laboratories Supplies")
+
 
 class Stock(BaseModel):  # المخزون
-    product = models.OneToOneField(
-        Product,
+    lab_supply = models.OneToOneField(
+        LabSupply,
         on_delete=models.CASCADE,
-        verbose_name=_("Product"),
+        verbose_name=_("Laboratory Supply"),
     )
     # TODO PRODUCT DEATAILS STOCK
     product_details = models.ManyToManyField(
         LineInInvoice,
-        on_delete=models.CASCADE,
         verbose_name=_("Product Details"),
         related_name="%(app_label)s_%(class)s_Product_Details",
     )
 
     @property
     def packing(self):
-        return self.product.default_packing
+        return self.lab_supply.default_packing
 
     @property  # inventory  المخزون
     def stock(self):
@@ -47,16 +51,43 @@ class Stock(BaseModel):  # المخزون
     #     return reverse("_detail", kwargs={"pk": self.pk})
 
 
-class TechniqueMethod(BaseModelName):
+class ShortCut(BaseModelName):
+    
+    class Meta:
+        verbose_name = _("ShortCut")
+        verbose_name_plural = _("ShortCuts")
+
+
+class BodyLiquid(BaseModelName):
+    genders = models.ManyToManyField(
+        Gender,
+        verbose_name=_("Genders"),
+        related_name="%(app_label)s_%(class)s_Genders",
+    )
+
+    class Meta:
+        verbose_name = _("BodyLiquid")
+        verbose_name_plural = _("BodyLiquids")
+
+
+class AnalyticalTechnique(BaseModelName):
+
     class Meta:
         verbose_name = _("Technique Method")
         verbose_name_plural = _("Technique Methods")
 
 
-class ShortCut(BaseModelName):
+class ENeedNormal(models.Model):
+    normal_range = models.ManyToManyField(
+        NREntity,
+        verbose_name=_("Normal Range"),
+        through="NormalRange",
+        related_name="%(app_label)s_%(class)s_Normal_Range",
+    )
+
     class Meta:
-        verbose_name = _("ShortCut")
-        verbose_name_plural = _("ShortCuts")
+        verbose_name = _("ENeed Normal")
+        verbose_name_plural = _("ENeed Normals")
 
 
 # TODO Duration Sample
@@ -65,9 +96,9 @@ class Sample(BaseModelName):
     class Action(models.TextChoices):
         Prandial = "Prandial"
         
-    comment = models.TextField(
+    comments = models.TextField(
         max_length=200,
-        verbose_name=_("Comment"),
+        verbose_name=_("Comments"),
     )
     time = models.TimeField(
         blank=True,
@@ -80,139 +111,125 @@ class Sample(BaseModelName):
         null=True,
         verbose_name=_("Duration Action"),
     )
-    is_need_collection_tube = models.BooleanField(default=True, verbose_name=_("Is Need Collection Tube"))
+    bodyLiquid = models.ForeignKey(BodyLiquid, on_delete=models.CASCADE, verbose_name=_("BodyLiquid"), related_name="%(app_label)s_%(class)s_BodyLiquid",)
+
 
     class Meta:
         verbose_name = _("Sample")
         verbose_name_plural = _("Samples")
 
 
-class MedicalSupply(Product):
-
-    class Meta:
-        verbose_name = _("Medical Supply")
-        verbose_name_plural = _("Medical Supplies")
-
-
-class Parameter(PolymorphicModel, BaseModelName):
+class Parameter(BaseModelName):
     
     shortCuts = models.ManyToManyField(
         ShortCut,
         verbose_name=_("ShortCuts"),
         related_name="%(app_label)s_%(class)s_ShortCuts",
     )
-    used_units = models.ManyToManyField(
-        Unit,
-        through="ParameterUnit",
-        verbose_name=_("Used Units"),
-    )
-    molecular_weight = models.SmallIntegerField(blank=True, null=True, verbose_name=_("Molecular Weught"))
+    units = models.ManyToManyField(Unit, verbose_name=_("Units"), through="ParameterUnit", related_name="%(app_label)s_%(class)s_Units",)
+    bodyLiquid = models.ManyToManyField(BodyLiquid, verbose_name=_("BodyLiquid"), through="BodyLiquidParameter", related_name="%(app_label)s_%(class)s_BodyLiquid",)
+    # TODO CHEMICAL STRCTURE
+    molecular_weight = models.SmallIntegerField(blank=True, null=True, verbose_name=_("Molecular Weight"))
 
-    class Meta:
+    class Meta:  
         verbose_name = _("Parameter")
         verbose_name_plural = _("Parameters")
 
 
-class Kat(Product):
-    parameters = models.ManyToManyField(
-        Parameter,
-        through="KatParameter",
-        verbose_name=_("Parameters"),
-        related_name="%(app_label)s_%(class)s_Parameters",
-    )
-    
-    class Meta:
-        verbose_name = _("Kat")
-        verbose_name_plural = _("Kats")
-
-
-class Standard(models.Model):
-    serial = models.CharField(max_length=20, primary_key=True, verbose_name=_("Serial No."),)
-    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name=_("Brand"), related_name="%(app_label)s_%(class)s_Brand",)
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
-    concentration = models.DecimalField(max_digits=3, decimal_places=2, verbose_name=_("Concentration"),)
-
-    def __str__(self):
-        return f"{str(self.brand)}->{str(self.parameter)}"
-
-    @property
-    def slug(self):
-        return self.__str__
-
-    class Meta:
-        verbose_name = _("Standard")
-        verbose_name_plural = _("Standards")
-
-
-class KatParameter(models.Model):
-    kat = models.ForeignKey(
-        Kat,
-        on_delete=models.CASCADE,
-        verbose_name=_("Kat"),
-        related_name="%(app_label)s_%(class)s_Kat",
-    )
+class ParameterUnit(models.Model):
     parameter = models.ForeignKey(
         Parameter,
         on_delete=models.CASCADE,
         verbose_name=_("Parameter"),
-        related_name="%(app_label)s_%(class)s_Parameter",
     )
-    samples = models.ManyToManyField(
-        Sample,
-        through="SampleKatParameter",
-        verbose_name=_("Samples"),
-        related_name="%(app_label)s_%(class)s_Samples",
-    )
-    used_unit = models.ForeignKey(
+    unit = models.ForeignKey(
         Unit,
         on_delete=models.CASCADE,
-        verbose_name=_("Used Unit"),
-        related_name="%(app_label)s_%(class)s_Used_Unit",
+        verbose_name=_("Unit"),
     )
-    normal_range = 
+    is_favorite = models.BooleanField(
+        default=True,
+        verbose_name=_("Is Favorite"),
+    )   
 
     def __str__(self):
-        return f"{str(self.kat)}->{str(self.parameter)}"
+        return f"{self.parameter}->{self.unit}"
 
     @property
     def slug(self):
-        return self.__str__
+        return slugify(self.__str__)
 
     class Meta:
-        unique_together = [["kat", "parameter"]]
-        verbose_name = _("Kat Parameter")
-        verbose_name_plural = _("Kat Parameters")
+        unique_together = [["parameter", "unit"]]
+        verbose_name = _("Parameter Unit")
+        verbose_name_plural = _("Parameter Units")
 
 
-class SampleKatParameter(models.Model):
-    kat_parameter = models.ForeignKey(
-        KatParameter,
-        on_delete=models.CASCADE,
-        verbose_name=_("Kat Parameter"),
-        related_name="%(app_label)s_%(class)s_Kat_Parameter",
-    )
-    sample = models.ForeignKey(
-        Sample,
-        on_delete=models.CASCADE,
-        verbose_name=_("Sample"),
-        related_name="%(app_label)s_%(class)s_Sample",
-    )
-    is_favorite = models.BooleanField(default=True, verbose_name=_("Is favorite"),)
+class AnalyticalMethod(models.Model):
+    class AnalyticalMethods(models.TextChoices):
+        Qualitative = "Qualitative"
+        SemiQuantitative = "Semi Quantitative"
+        Quantitative = "Quantitative"
+
+    name = models.CharField(max_length=20, verbose_name=_("Name"), choices=AnalyticalMethods.choices,)
 
     def __str__(self):
-        return f"{str(self.kat_parameter)}->{str(self.sample)}"
+        return self.name
 
-    @property
     def slug(self):
-        return self.__str__
+        return slugify(self.__str__)
 
     class Meta:
-        unique_together = [["kat_parameter", "sample"]]
-        verbose_name = _("Sample Kat Parameter")
-        verbose_name_plural = _("Sample Kat Parameters")
+        verbose_name = _("Analytical Method")
+        verbose_name_plural = _("Analytical Methods")
 
 
-class Analyzer(Product):
+class BodyLiquidParameter(models.Model):
+    bodyLiquid = models.ForeignKey(BodyLiquid, on_delete=models.CASCADE, verbose_name=_("BodyLiquid"), related_name="%(app_label)s_%(class)s_BodyLiquid",)
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
+    analytical_method = models.ManyToManyField(AnalyticalMethod, verbose_name=_("Analytical Method"), through="BodyLiquidParameterAnalyticalMethod", related_name="%(app_label)s_%(class)s_AnalyticalMethod",)
+    
+    def __str__(self):
+        return f"{self.bodyLiquid}->{self.parameter}"
+
+    def slug(self):
+        return slugify(self.__str__)
+
+    class Meta:
+        unique_together = [["bodyLiquid", "parameter"]]
+        verbose_name = _("BodyLiquid Parameter")
+        verbose_name_plural = _("BodyLiquid Parameters")
+
+
+class BodyLiquidParameterAnalyticalMethod(models.Model):
+    bodyLiquid_parameter = models.ForeignKey(BodyLiquidParameter, on_delete=models.CASCADE, verbose_name=_("BodyLiquid Parameter"), related_name="%(app_label)s_%(class)s_BodyLiquid_Parameter",)
+    analytical_method = models.ForeignKey(AnalyticalMethod, on_delete=models.CASCADE, verbose_name=_("Analytical Method"), related_name="%(app_label)s_%(class)s_Analytical_Method",)
+
+    def __str__(self):
+        return f"{self.bodyLiquid_parameter}->{self.analytical_method}"
+
+    def slug(self):
+        return slugify(self.__str__)
+
+    class Meta:
+        unique_together = [["bodyLiquid_parameter", "analytical_method"]]
+        verbose_name = _("BodyLiquid Parameter Analytical Method")
+        verbose_name_plural = _("BodyLiquid Parameter Analytical Methods")
+
+
+class KatSensitivity(models.Model):
+    low_sensitivity = models.DecimalField(max_digits=5, decimal_places=4, blank=True, null=True, verbose_name=_("Low Sensitivity"), )
+    high_sensitivity = models.DecimalField(max_digits=5, decimal_places=4, blank=True, null=True, verbose_name=_("High Sensitivity"), )
+
+    def __str__(self):
+        return f"{self.low_sensitivity}->{self.high_sensitivity}"
+
+    class Meta:
+        verbose_name = _("Kat Sensitivity")
+        verbose_name_plural = _("Kat Sensitivities")
+
+
+class Analyzer(LabSupply):
     class Analyzers(models.TextChoices):
         HematolgyAnalyzer = "HematolgyAnalyzer"
         ElectrolyteAnalyzer = "ElectrolyteAnalyzer"
@@ -243,24 +260,137 @@ class Analyzer(Product):
 
 
 class ClosedSystemAnalyzer(Analyzer):
-    kats = models.ManyToManyField(Kat , verbose_name=_("Kats"), through="KatClosedSystemAnalyzer",related_name="%(app_label)s_%(class)s_Kats",)
 
     class Meta:
         verbose_name = _("Closed System Analyzer")
         verbose_name_plural = _("Closed System Analyzers")
+ 
+
+class Kat(LabSupply):
+    parameter = models.ForeignKey(
+        Parameter,
+        on_delete=models.CASCADE,
+        verbose_name=_("Parameter"),
+        related_name="%(app_label)s_%(class)s_Parameter",
+    )
+    samples = models.ManyToManyField(
+        Sample,
+        through="KatSample",
+        verbose_name=_("Samples"),
+        related_name="%(app_label)s_%(class)s_Samples",
+    )
+    technique_method = models.ForeignKey(TechniqueMethod, on_delete=models.CASCADE, verbose_name=_("Technique Method"), related_name="%(app_label)s_%(class)s_Technique_Method",)
+        
+    class Meta:
+        verbose_name = _("Kat")
+        verbose_name_plural = _("Kats")
 
 
-class KatClosedSystemAnalyzer(models.Model):
-    closed_system_analyzer = models.ForeignKey(ClosedSystemAnalyzer, on_delete=models.CASCADE, verbose_name=_("Closed System Analyzer"), related_name="%(app_label)s_%(class)s_Closed_System_Analyzer",)
-    kat = models.ForeignKey(Kat, on_delete=models.CASCADE, verbose_name=_("Kat"), related_name="%(app_label)s_%(class)s_Kat",)
+class QualitativeKat(Kat):
+
+    class Meta:
+        verbose_name = _("Qualitative Kat")
+        verbose_name_plural = _("Qualitative Kats")
+
+
+class QuantitativeKat(Kat):
+    normal_range = models.ForeignKey(ENeedNormal, on_delete=models.CASCADE, verbose_name=_("Normal range"), related_name="%(app_label)s_%(class)s_Normal_range",)
+    kat_sensitivity = models.ForeignKey(KatSensitivity, on_delete=models.CASCADE, verbose_name=_("Kat Sensitivity"), related_name="%(app_label)s_%(class)s_Kat_Sensitivity",blank=True, null=True,)
+    used_unit = models.ForeignKey(
+        Unit,
+        on_delete=models.CASCADE,
+        verbose_name=_("Used Unit"),
+        related_name="%(app_label)s_%(class)s_Used_Unit",
+    )
+
+    class Meta:
+        verbose_name = _("Quantitative Kat")
+        verbose_name_plural = _("Quantitative Kats")
+
+
+class OpenSystemKat(QuantitativeKat):
+
+    class Meta:
+        verbose_name = _("Open System Kat")
+        verbose_name_plural = _("Open System Kats")
+
+
+class ClosedSystemKat(QuantitativeKat):
+    analyzer = models.ForeignKey(ClosedSystemAnalyzer, on_delete=models.CASCADE, verbose_name=_("Closed System Analyzer"), related_name="%(app_label)s_%(class)s_Closed_System_Analyzer",)
     start_up_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("Start Up Consumption"),) # استهلاك الكيمويات فى فتح الجهاز
     test_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("Test Consumption"),) # استهلاك الكيمويات لتحليل
     end_consumption = models.DecimalField(max_digits=2, decimal_places=2, blank=True, null=True, verbose_name=_("End Consumption"),) # استهلاك الكيمويات فى غلق الجهاز
-    
+
     class Meta:
-        unique_together = [["closed_system_analyzer", "kat", ]]
-        verbose_name = _("Kat Closed System Analyzer")
-        verbose_name_plural = _("Kat Closed System Analyzers")
+        verbose_name = _("Closed System Kat")
+        verbose_name_plural = _("Closed System Kats")
+
+
+class Standard(models.Model):
+    serial = models.CharField(max_length=20, primary_key=True, verbose_name=_("Serial No."),)
+    brand = models.ForeignKey(Brand, on_delete=models.CASCADE, verbose_name=_("Brand"), related_name="%(app_label)s_%(class)s_Brand",)
+    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
+    concentration = models.DecimalField(max_digits=3, decimal_places=2, verbose_name=_("Concentration"),)
+
+    def __str__(self):
+        return f"{str(self.brand)}->{str(self.parameter)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        verbose_name = _("Standard")
+        verbose_name_plural = _("Standards")
+
+
+class KatSample(models.Model):
+    kat = models.ForeignKey(
+        Kat,
+        on_delete=models.CASCADE,
+        verbose_name=_("Kat"),
+        related_name="%(app_label)s_%(class)s_Kat",
+    )
+    sample = models.ForeignKey(
+        Sample,
+        on_delete=models.CASCADE,
+        verbose_name=_("Sample"),
+        related_name="%(app_label)s_%(class)s_Sample",
+    )
+    is_favorite = models.BooleanField(default=True, verbose_name=_("Is favorite"),)
+
+    def __str__(self):
+        return f"{str(self.kat)}->{str(self.sample)}"
+
+    @property
+    def slug(self):
+        return self.__str__
+
+    class Meta:
+        unique_together = [["kat", "sample"]]
+        verbose_name = _("Kat Sample")
+        verbose_name_plural = _("Kat Samples")
+
+
+# class QualitativeBodyLiquidParameter(BodyLiquidParameter):
+
+#     class Meta:
+#         verbose_name = _("Qualitative BodyLiquid Parameter")
+#         verbose_name_plural = _("Qualitative BodyLiquid Parameters")
+
+
+# class QuantitativeBodyLiquidParameter(BodyLiquidParameter):
+#     minimum_value = models.DecimalField(max_digits=5, decimal_places=4, blank=True, null=True, verbose_name=_("Minimum Value"), )
+#     maximum_value = models.DecimalField(max_digits=5, decimal_places=4, blank=True, null=True, verbose_name=_("Maximum Value"), )
+#     units = models.ManyToManyField(
+#         Unit,
+#         through="SampleParameterUnit",
+#         verbose_name=_("Units"),
+#     )
+
+#     class Meta:
+#         verbose_name = _("Quantitative BodyLiquid Parameter")
+#         verbose_name_plural = _("Quantitative BodyLiquid Parameters")
 
 
 # NOTE Bind with Medicin
@@ -283,39 +413,12 @@ class DisksAntiBiotic(Kat):
         verbose_name_plural = _("Disks Anti-Biotics")
 
 
-class CalculatedParameter(Parameter):
-    equation_parameter = models.ManyToManyField(Parameter, verbose_name=_("Equation Parameter"), through="EquationParameter", related_name="%(app_label)s_%(class)s_Equation_Parameter",)
-    equation = models.CharField(max_length=20, verbose_name=_("Equation"),)
-    
-    class Meta:
-        verbose_name = _("Calculated Parameter")
-        verbose_name_plural = _("Calculated Parameters")
-
-
-class EquationParameter(models.Model):
-    parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Parameter"), related_name="%(app_label)s_%(class)s_Parameter",)
-    related_parameter = models.ForeignKey(Parameter, on_delete=models.CASCADE, verbose_name=_("Related Parameter"), related_name="%(app_label)s_%(class)s_Related_Parameter",)
-    symbol_in_equation = models.CharField(max_length=1, verbose_name=_("Symbol in Equation"))
-
-    def __str__(self):
-        return f"{str(self.parameter)}->{str(self.related_parameter)}"
-
-    @property
-    def slug(self):
-        return self.__str__
-
-    class Meta:
-        uniqe_together = [["parameter", "related_parameter"]]
-        verbose_name = _("Equation Parameter")
-        verbose_name_plural = _("Equation Parameters")
-
-
-class RunedParameter(Parameter):
+class RunedParameter(QuantitativeSampleParameter):
     samples = models.ManyToManyField(
         Sample,
-        through="SampleParameter",
-        symmetrical=False,
+        through="SampleRunedParameter",
         verbose_name=_("Samples"),
+        related_name="%(app_label)s_%(class)s_Samples",
     )
 
     class Meta:
@@ -323,95 +426,32 @@ class RunedParameter(Parameter):
         verbose_name_plural = _("Runed Parameters")
 
 
-class ParameterUnit(models.Model):
-    parameter = models.ForeignKey(
-        Parameter,
-        on_delete=models.CASCADE,
-        verbose_name=_("Parameter"),
-    )
-    unit = models.ForeignKey(
-        Unit,
-        on_delete=models.CASCADE,
-        verbose_name=_("Unit"),
-    )
-    is_default = models.BooleanField(
-        default=True,
-        verbose_name=_("is Default"),
-    )
-    parameter_unit_related = models.ManyToManyField(
-        "self",
-        through="ParameterUnitConvert",
-        symmetrical=True,
-        verbose_name=_("Parameter Unit Related"),
-    )
+class CalculatedParameter(QuantitativeSampleParameter):
+    equation_parameter = models.ManyToManyField(RunedParameter, verbose_name=_("Equation Parameter"), through="EquationParameter", related_name="%(app_label)s_%(class)s_Equation_Parameter",)
+    equation = models.CharField(max_length=20, verbose_name=_("Equation"),)
+    
+    class Meta:
+        verbose_name = _("Calculated Parameter")
+        verbose_name_plural = _("Calculated Parameters")
+
+
+
+class EquationParameter(models.Model):
+    calculated_parameter = models.ForeignKey(CalculatedParameter, on_delete=models.CASCADE, verbose_name=_("Calculated Parameter"), related_name="%(app_label)s_%(class)s_Calculated_Parameter",)
+    related_runed_parameter = models.ForeignKey(RunedParameter, on_delete=models.CASCADE, verbose_name=_("Related Runed Parameter"), related_name="%(app_label)s_%(class)s_Related_Runed_Parameter",)
+    symbol_in_equation = models.CharField(max_length=1, verbose_name=_("Symbol in Equation"))
 
     def __str__(self):
-        return f"{self.parameter}->{self.unit}"
+        return f"{str(self.calculated_parameter)}->{str(self.related_runed_parameter)}"
 
     @property
     def slug(self):
-        return slugify(f"{self.parameter}->{self.unit}")
+        return self.__str__
 
     class Meta:
-        unique_together = [["parameter", "unit"]]
-        verbose_name = _("Parameter Unit")
-        verbose_name_plural = _("Parameter Units")
-
-
-class ParameterUnitConvert(models.Model):
-    from_parameter_unit = models.ForeignKey(
-        ParameterUnit,
-        on_delete=models.CASCADE,
-        verbose_name=_("from Parameter Unit"),
-    )
-    to_parameter_unit = models.ForeignKey(
-        ParameterUnit,
-        on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_parameter_unit_convert",
-        verbose_name=_("to Parameter Unit"),
-    )
-    factor = models.DecimalField(
-        max_digits=5,
-        decimal_places=4,
-        verbose_name=_("Factor"),
-    )
-
-    def __str__(self):
-        return f"{self.from_parameter_unit}->{self.to_parameter_unit}"
-
-    @property
-    def slug(self):
-        return slugify(f"{self.from_parameter_unit}->{self.to_parameter_uni}")
-
-    class Meta:
-        unique_together = [["from_parameter_unit", "to_parameter_unit"]]
-        verbose_name = _("Parameter Unit Convert")
-        verbose_name_plural = _("Parameter Unit Converts")
-
-
-class AnalyzerKatTechniqueMethod(models.Model):
-    analyzer = models.ForeignKey(
-        Analyzer,
-        on_delete=models.CASCADE,
-        verbose_name=_("Analyzer"),
-    )
-    kat_technique_method = models.ForeignKey(
-        KatTechniqueMethod,
-        on_delete=models.CASCADE,
-        verbose_name=_("Kat Technique Method"),
-    )
-
-    def __str__(self):
-        return f"{self.analyzer}->{self.kat_technique_method}"
-
-    @property
-    def slug(self):
-        return slugify(f"{self.analyzer}->{self.kat_technique_method}")
-
-    class Meta:
-        unique_together = [["analyzer", "kat_technique_method"]]
-        verbose_name = _("Analyzer Kat Technique Method")
-        verbose_name_plural = _("Analyzer Kat Technique Methods")
+        uniqe_together = [["calculated_parameter", "related_runed_parameter"]]
+        verbose_name = _("Equation Parameter")
+        verbose_name_plural = _("Equation Parameters")
 
 
 class BlockOfAnalysis(PolymorphicModel):  # Generalization for Price And ShortCut
@@ -420,32 +460,30 @@ class BlockOfAnalysis(PolymorphicModel):  # Generalization for Price And ShortCu
         on_delete=models.CASCADE,
         verbose_name=_("Shortcuts"),
         related_name="%(app_label)s_%(class)s_Shortcuts",
-        blank=True,
-        null=True,
     )
-    price_patient = models.DecimalField(
+    price_for_patient = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
-        verbose_name=_("Price Patient"),
+        verbose_name=_("Price For Patient"),
     )
-    price_lab = models.DecimalField(
+    price_for_laboratories = models.DecimalField(
         max_digits=5,
         decimal_places=2,
         null=True,
         blank=True,
-        verbose_name=_("Price Lab"),
+        verbose_name=_("Price For Laboratories"),
     )
     lab_2_lab = models.ManyToManyField(
         MainLab,
         through="MainLabMenu",
-        verbose_name=_("Lab to Lab"),
+        verbose_name=_("Lab To Lab"),
     )
 
     class Meta:
-        verbose_name = _("Group ShortCut")
-        verbose_name_plural = _("Group ShortCuts")
+        verbose_name = _("Block Of Analysis")
+        verbose_name_plural = _("Block Of Analysis")
 
 
 class Package(BaseModelName, BlockOfAnalysis):
@@ -461,6 +499,7 @@ class Package(BaseModelName, BlockOfAnalysis):
 
 
 class Report(BaseModelName, BlockOfAnalysis):
+
     class Meta:
         verbose_name = _("Report")
         verbose_name_plural = _("Reports")
@@ -492,59 +531,6 @@ class GroupAnalysis(BaseModelName, BlockOfAnalysis):
         verbose_name_plural = _("Group Analysis")
 
 
-class SampleParameter(models.Model):
-    parameter = models.ForeignKey(
-        Parameter,
-        on_delete=models.CASCADE,
-        verbose_name=_("Parameter"),
-    )
-    sample = models.ForeignKey(
-        Sample,
-        on_delete=models.CASCADE,
-        null=True,
-        blank=True,
-        verbose_name=_("Sample"),
-    )
-
-    group_analysis = models.ForeignKey(
-        GroupAnalysis,
-        verbose_name=_("Group Analysis"),
-        on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_Group_Analysis",
-    )
-
-    analyzer_kat_technique_method = models.ManyToManyField(
-        AnalyzerKatTechniqueMethod,
-        through="Analysis",
-        verbose_name=_("analyzer Kat Technique Method"),
-    )
-
-    def __str__(self):
-        return f"{self.sample}->{self.parameter}"
-
-    @property
-    def slug(self):
-        return slugify(f"{self.sample}->{self.parameter}")
-
-    class Meta:
-        unique_together = [["parameter", "sample"]]
-        verbose_name = _("Sample Parameter")
-        verbose_name_plural = _("Sample Parameters")
-
-
-class ENeedNormal(models.Model):
-    normal_range = models.ManyToManyField(
-        NREntity,
-        verbose_name=_("Normal Range"),
-        through="NormalRange",
-        related_name="%(app_label)s_%(class)s_Normal_Range",
-    )
-
-    class Meta:
-        verbose_name = _("ENeed Normal")
-        verbose_name_plural = _("ENeed Normals")
-
-
 class NormalRange(models.Model):
     n_r_entity = models.ForeignKey(
         NREntity,
@@ -566,20 +552,18 @@ class NormalRange(models.Model):
 
 
 class Analysis(BlockOfAnalysis):
-    sample_parameter = models.ForeignKey(
-        SampleParameter,
+    sample_runed_parameter = models.ForeignKey(
+        SampleRunedParameter,
         on_delete=models.CASCADE,
-        verbose_name=_("Sample Parameter"),
-        related_name="%(app_label)s_%(class)s_Sample_Parameter",
+        verbose_name=_("Sample Runed Parameter"),
+        related_name="%(app_label)s_%(class)s_Sample_Runed_Parameter",
     )
-    analyzer_kat_technique_method = models.ForeignKey(
-        AnalyzerKatTechniqueMethod,
+    technique_method = models.ForeignKey(
+        AnalyticalTechnique,
         on_delete=models.CASCADE,
-        verbose_name=_("Analyzer Kat Technique Method"),
-        related_name="%(app_label)s_%(class)s_Analyzer_Kat_Technique_Method",
-    )
-    
-    # TODO Normal Range
+        verbose_name=_("Technique Method"),
+        related_name="%(app_label)s_%(class)s_Technique_Method",
+    )    
     normal_range = models.ForeignKey(
         ENeedNormal,
         on_delete=models.CASCADE,
@@ -588,13 +572,10 @@ class Analysis(BlockOfAnalysis):
         blank=True,
         null=True,
     )
-    group_analysis = models.ForeignKey(
-        GroupAnalysis,
-        verbose_name=_("Group Analysis"),
-        on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_Group_Analysis",
-        blank=True,
-        null=True,
+    belong_to = models.ManyToManyField(
+        BlockOfAnalysis,
+        verbose_name=_("Belong To"),
+        related_name="%(app_label)s_%(class)s_Belong_To",
     )
     is_default = models.BooleanField(
         default=True,
@@ -608,7 +589,7 @@ class Analysis(BlockOfAnalysis):
 
     def __str__(self):
         return (
-            f"{str(self.sample_parameter)}->{str(self.analyzer_kat_technique_method)}"
+            f"{str(self.sample_runed_parameter)}->{str(self.technique_method)}"
         )
 
     @property
@@ -618,8 +599,8 @@ class Analysis(BlockOfAnalysis):
     class Meta:
         unique_together = [
             [
-                "sample_parameter",
-                "analyzer_kat_technique_method",
+                "sample_runed_parameter",
+                "technique_method",
             ]
         ]
         verbose_name = _("Analysis")

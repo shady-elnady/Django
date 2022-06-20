@@ -4,7 +4,7 @@
         "fields": {
             "native": "Dollar United States",
             "code": "USD",
-            "emoji": "💲"
+            "symbol": "💲"
         }
     },
     {
@@ -13,7 +13,7 @@
         "fields": {
             "native": "Rupee's India",
             "code": "INR",
-            "emoji": "₹"
+            "symbol": "₹"
         }
     },
     {
@@ -22,7 +22,7 @@
         "fields": {
             "native": "",
             "code": "TWD",
-            "emoji": "🇹🇼"
+            "symbol": "🇹🇼"
         }
     },
     {
@@ -31,7 +31,7 @@
         "fields": {
             "native": "Euro",
             "code": "EUR",
-            "emoji": "💶 €"
+            "symbol": "💶 €"
         }
     },
     {
@@ -40,7 +40,7 @@
         "fields": {
             "native": "円",
             "code": "JPY",
-            "emoji": "💴"
+            "symbol": "💴"
         }
     },
     {
@@ -49,7 +49,7 @@
         "fields": {
             "native": "",
             "code": "TRY",
-            "emoji": "₺"
+            "symbol": "₺"
         }
     },
     {
@@ -58,7 +58,7 @@
         "fields": {
             "native": "جنيه مصرى",
             "code": "EGP",
-            "emoji": "💷"
+            "symbol": "💷"
         }
     },
     {
@@ -67,7 +67,7 @@
         "fields": {
             "native": "دينار أردنى",
             "code": "JOD",
-            "emoji": ""
+            "symbol": ""
         },
         "equal_dolar": "",
         "last_update": ""
@@ -78,7 +78,7 @@
         "fields": {
             "native": "دينار كويتى",
             "code": "KWD",
-            "emoji": "🇰🇼"
+            "symbol": "🇰🇼"
         }
     },
     {
@@ -87,7 +87,7 @@
         "fields": {
             "native": "دينار ليبى",
             "code": "LYD",
-            "emoji": ""
+            "symbol": ""
         }
     },
     {
@@ -96,7 +96,7 @@
         "fields": {
             "native": "دينار تونسى",
             "code": "TND",
-            "emoji": ""
+            "symbol": ""
         }
     },
     {
@@ -105,7 +105,7 @@
         "fields": {
             "native": "دينار عراقى",
             "code": "IQD",
-            "emoji": ""
+            "symbol": ""
         }
     },
     {
@@ -114,7 +114,7 @@
         "fields": {
             "native": "ريال قطرى",
             "code": "QAR",
-            "emoji": ""
+            "symbol": ""
         }
     },
     {
@@ -123,7 +123,7 @@
         "fields": {
             "native": "ريال سعودى",
             "code": "SAR",
-            "emoji": "🇸🇦"
+            "symbol": "🇸🇦"
         }
     },
     {
@@ -132,7 +132,7 @@
         "fields": {
             "native": "ريال عمانى",
             "code": "OMR",
-            "emoji": "🏳️‍🌈"
+            "symbol": "🏳️‍🌈"
         }
     },
     {
@@ -141,7 +141,7 @@
         "fields": {
             "native": "درهم إمارتى",
             "code": "AED",
-            "emoji": "🇦🇪"
+            "symbol": "🇦🇪"
         }
     }
 ]
