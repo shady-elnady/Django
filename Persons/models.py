@@ -3,16 +3,17 @@ from django.db import models  # from django.db.models import Model, ForeignKey, 
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin
+from PIL import Image
 from datetime import date
 import calendar
 
 from .managers import FollowingManager, UsersManager
-from GraphQL.models import BaseModel, BaseModelName
+from GraphQL.models import BaseModel, BaseModelName, BaseModelNative, Shifts, WeekDays
 from Facilities.models import Branch, Job
 from polymorphic.models import PolymorphicModel
 from djongo.models import ArrayReferenceField
 from Languages.models import Language
-from Location.models import Caller
+from Location.models import Contacts
 
 
 # Create your models here.
@@ -111,12 +112,12 @@ class Person(PolymorphicModel, BaseModel):
         default="ar",
         verbose_name=_("Language"),
     )
-    caller = models.ForeignKey(
-        Caller,
+    contact_method = models.ForeignKey(
+        Contacts,
         on_delete=models.CASCADE,
-        verbose_name=_("Caller"),
-        related_name="%(app_label)s_%(class)s_Caller",
-    )
+        verbose_name=_("Contact_Method"),
+        related_name="%(app_label)s_%(class)s_Contact_Method",
+    )  # طرق الاتصال
 
     @property
     def age(self):
@@ -156,9 +157,14 @@ class Person(PolymorphicModel, BaseModel):
         verbose_name_plural = _("Persons")
 
 
+class kinshipRelations(models.TextChoices):
+    Father = _("Father")
+    Mother = _("Mother")
+    Brother = _("Brother")
+    Sister = _("Sister")
+
+
 class Kinship(models.Model):
-    class kinshipRelations(models.TextChoices):
-        a = "a"
 
     person = models.ForeignKey(
         Person,
@@ -167,6 +173,7 @@ class Kinship(models.Model):
     kinshiper = models.ForeignKey(
         Person,
         on_delete=models.CASCADE,
+        verbose_name=_("Kinshiper"),
         related_name="%(app_label)s_%(class)s_kinshiper",
     )
     Relation = models.CharField(
@@ -190,18 +197,6 @@ class Kinship(models.Model):
         verbose_name_plural = _("Kinships")
 
 
-# class Pharmacist(Person):  # صيدلي
-#     class Meta:
-#         verbose_name = _("Pharmacist")
-#         verbose_name_plural = _("Pharmacists")
-
-
-# class Customer(Person):
-#     class Meta:
-#         verbose_name = _("Customer")
-#         verbose_name_plural = _("Customers")
-
-
 class Patient(Person):
     class Meta:
         verbose_name = _("Patient")
@@ -209,7 +204,7 @@ class Patient(Person):
 
 
 # TODO Permission class Bind to MIXIN
-class Permission(BaseModelName):
+class Permission(BaseModelName, PermissionsMixin):
     class Meta:
         verbose_name = _("Permission")
         verbose_name_plural = _("Permissions")
@@ -217,14 +212,21 @@ class Permission(BaseModelName):
 
 class Employee(Person):
 
-    branch = models.ForeignKey(Branch, on_delete=models.CASCADE)
-    salary = models.DecimalField(max_digits=5, decimal_places=2)
-    attendance_time = models.TimeField()  # ميعاد الحضور
-    check_out_time = models.TimeField()  # ميعاد الانصراف
-    permissions = ArrayReferenceField(
-        to=Permission,
+    branch = models.ForeignKey(
+        Branch,
         on_delete=models.CASCADE,
+        verbose_name=_("Branch"),
+        related_name="%(app_label)s_%(class)s_Branch",
     )
+    salary = models.DecimalField(
+        max_digits=5,
+        decimal_places=2,
+        verbose_name=_("Salary"),
+    )
+    is_former_employee = models.BooleanField(
+        default=False,
+        verbose_name=_("is Former Employee"),
+    )  # موظف سابق
 
     class Meta:
         verbose_name = _("Employee")
@@ -232,10 +234,6 @@ class Employee(Person):
 
 
 class User(Person, AbstractBaseUser, PermissionsMixin):
-    USERNAME_FIELD = "username"
-    REQUIRED_FIELDS = ["email"]
-
-    objects = UsersManager()
 
     username = models.CharField(
         max_length=30,
@@ -243,10 +241,24 @@ class User(Person, AbstractBaseUser, PermissionsMixin):
         null=False,
         blank=False,
     )
+    permissions = models.ManyToManyField(
+        Permission,
+        on_delete=models.CASCADE,
+        verbose_name=_("Permissions"),
+        related_name="%(app_label)s_%(class)s_Permissions",
+    )
+    last_login = models.DateTimeField(blank=True, null=True)
+
     is_active = models.BooleanField(default=True)
 
     is_staff = models.BooleanField(default=False)
     # is_superuser = models.BooleanField(default=False)
+
+    USERNAME_FIELD = "username"
+    EMAIL_FIELD = "email"
+    REQUIRED_FIELDS = ["email"]
+
+    objects = UsersManager()
 
     class Meta:
         verbose_name = _("User")
@@ -282,8 +294,8 @@ class Following(BaseModel):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE)
     profile_image = models.ImageField(
-        default="images/default_profile_img.jpg",
-        upload_to="user_profile_img",
+        default="images/Profiles/default_profile.jpg",
+        upload_to="images/Profiles/",
         blank=True,
         null=True,
     )
@@ -294,7 +306,17 @@ class Profile(models.Model):
         return slugify(str(self.user))
 
     def __str__(self):
-        return str(self.user)
+        return f"{self.user.username} Profile"
+
+    def save(self):
+        super().save()
+
+        img = Image.open(self.profile_image.path)
+
+        if img.height > 300 or img.width > 300:
+            output_size = (300, 300)
+            img.thumbnail(output_size)
+            img.save(self.profile_image.path)
 
     class Meta:
         verbose_name = _("Profile")
@@ -304,68 +326,20 @@ class Profile(models.Model):
     #     return reverse("_detail", kwargs={"pk": self.pk})
 
 
-class Specialization(BaseModelName):
+class MedicalSpecialization(BaseModelName):
     class Meta:
         verbose_name = _("Specialization")
         verbose_name_plural = _("Specializations")
 
 
 class Doctor(Person):
-    specialization = models.CharField(max_length=50)
+    medical_specialization = models.ForeignKey(
+        MedicalSpecialization,
+        on_delete=models.CASCADE,
+        verbose_name=_("Medical Specialization"),
+        related_name="%(app_label)s_%(class)s_Medical_Specialization",
+    )
 
     class Meta:
         verbose_name = _("Doctor")
         verbose_name_plural = _("Doctors")
-
-
-class LabEmployee(Employee):
-    class Meta:
-        verbose_name = _("Lab Employee")
-        verbose_name_plural = _("Lab Employees")
-
-
-# TODO Employee Attendance Management System
-## https://itsourcecode.com/uml/employee-attendance-management-system-er-diagram-erd/
-
-
-class Work(BaseModelName):
-    department = models.ForeignKey(Department, on_delete=models.CASCADE)
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-
-    class Meta:
-        verbose_name = _("Work")
-        verbose_name_plural = _("Works")
-
-
-class Duty(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    work = models.ForeignKey(Work, on_delete=models.CASCADE)
-    duration = models.DurationField()
-    _date = models.DateField()
-
-    class Meta:
-        verbose_name = _("Duty")
-        verbose_name_plural = _("Duties")
-
-
-class Leave(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    work = models.ForeignKey(Work, on_delete=models.CASCADE)
-    _date = models.DateField()
-
-    class Meta:
-        verbose_name = _("Leave")
-        verbose_name_plural = _("Leaves")
-
-
-class Attendance(models.Model):
-    employee = models.ForeignKey(Employee, on_delete=models.CASCADE)
-    work = models.ForeignKey(Work, on_delete=models.CASCADE)
-    duty = models.ForeignKey(Duty, on_delete=models.CASCADE)
-    total_labor = models.DecimalField(max_digits=5, decimal_places=2)
-    salary = models.DecimalField(max_digits=5, decimal_places=2)
-    _date = models.DateField()
-
-    class Meta:
-        verbose_name = _("Attendance")
-        verbose_name_plural = _("Attendances")

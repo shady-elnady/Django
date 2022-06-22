@@ -1,16 +1,76 @@
 from django.db import models
+from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
+
 from djongo.models import ArrayReferenceField
 from polymorphic.models import PolymorphicModel
 from GraphQL.models import BaseModel, BaseModelName
-from Facilities.models import Branch, MainLab
-from Persons.models import Doctor, Gender, LabEmployee, Patient
-from Products.models import Brand, LineInInvoice, MedicalSupply, Unit
-from django.utils.translation import gettext_lazy as _
-from django.utils.text import slugify
 from GraphQL.custom_fields import QRField
+from Facilities.models import Branch, Shift
+from Persons.models import Doctor, Employee, Gender, Patient
+from Products.models import Brand, LineInInvoice, MedicalSupply, Unit
 
 
 # Create your models here.
+
+class LabShift(Shift):  # شفتات ايام الاسبوع
+
+    class Meta:
+        verbose_name = _("Laboratory Shift")
+        verbose_name_plural = _("Laboratory Shifts")
+
+        
+class LabEmployee(Employee):
+
+    laboratory_shifts = models.ManyToManyField(
+        LabShift,
+        verbose_name=_("Laboratory Shift"),
+        related_name="%(app_label)s_%(class)s_Laboratory_Shift",
+    )
+    
+    class Meta:
+        verbose_name = _("Laboratory Employee")
+        verbose_name_plural = _("Laboratory Employees")
+
+
+# TODO Employee Attendance Management System
+## https://itsourcecode.com/uml/employee-attendance-management-system-er-diagram-erd/
+
+
+class LaboratoryAttendance(models.Model):  # الحضور والغياب
+
+    laboratory_employee = models.ForeignKey(
+        Employee,
+        on_delete=models.CASCADE,
+        verbose_name=_("Laboratory Employee"),
+        related_name="%(app_label)s_%(class)s_Laboratory_Employee",
+    )
+    laboratory_shift = models.ForeignKey(
+        Shift,
+        on_delete=models.CASCADE,
+        verbose_name=_("Laboratory Shift"),
+        related_name="%(app_label)s_%(class)s_Laboratory_Shift",
+    )
+    _date = models.DateField(
+        auto_now=True,
+        verbose_name=_("Date"),
+    )
+
+    @property
+    def duration(self):
+        attend = self.
+
+        if()
+        return 
+
+    class Meta:
+        unique_together = (
+            "laboratory_employee",
+            "laboratory_shift",
+        )
+        verbose_name = _("Laboratory Attendance")
+        verbose_name_plural = _("Laboratory Attendances")
+
 
 class LabSupply(MedicalSupply):
     

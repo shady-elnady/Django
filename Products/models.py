@@ -1,11 +1,13 @@
 from django.db import models
-from polymorphic.models import PolymorphicModel
-from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
-from Location.models import Country
-from Facilities.models import Compony
-from Persons.models import Customer, Employee
-from django.utils.translation import gettext_lazy as _
 from django.utils.text import slugify
+from django.utils.translation import gettext_lazy as _
+
+from polymorphic.models import PolymorphicModel
+from django_prices.models import MoneyField, TaxedMoneyField
+from Facilities.models import Facility
+from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName, FacilityTypes
+from Location.models import Country, FaceBook
+from Persons.models import Employee, Person
 from quantityfield.fields import (
     QuantityField,
     IntegerQuantityField,
@@ -13,13 +15,16 @@ from quantityfield.fields import (
     DecimalQuantityField,
 )
 
-from django_prices.models import MoneyField, TaxedMoneyField
-
-
 # from django_measurement.models import MeasurementField
 # from measurement.measures import Volume
 
 # Create your models here.
+
+
+class Customer(Person):
+    class Meta:
+        verbose_name = _("Customer")
+        verbose_name_plural = _("Customers")
 
 
 class Unit(BaseModelName):
@@ -161,7 +166,8 @@ class Invoice(models.Model):
         verbose_name=_("Employee Recipient"),
     )  # موظف الاستقبال
     supplier = models.ForeignKey(
-        Compony,
+        Facility,
+        limit_choices_to={"supplier": FacilityTypes.Supplier},
         on_delete=models.SET("Deleted"),
         verbose_name=_("Supplier"),
     )

@@ -95,6 +95,7 @@ INSTALLED_APPS = [
     "Location",
     "Facilities",  # منشآت
     "Persons",
+    # 'Persons.apps.UsersConfig',
     "Products",
     "Nady_System",
     "Articles",

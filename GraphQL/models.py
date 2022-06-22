@@ -1,3 +1,4 @@
+import calendar
 from django.db import models
 from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
@@ -78,3 +79,46 @@ class BaseModelLogo(BaseModelName):
 
     class Meta:
         abstract = True
+
+
+class WeekDays(models.TextChoices):
+    Saturday = "Sat", _(calendar.SATURDAY)
+    Sunday = "Sun", _(calendar.SUNDAY)
+    Monday = "Mon", _(calendar.MONDAY)
+    Tuesday = "Tue", _(calendar.TUESDAY)
+    Wednesday = "Wed", _(calendar.WEDNESDAY)
+    Thursday = "Thu", _(calendar.THURSDAY)
+    Friday = "Fri", _(calendar.FRIDAY)
+
+
+class Shifts(models.TextChoices):
+    Morning = _("Morning")
+    AfterNoon = _("AfterNoon")
+
+
+class FacilityTypes(models.TextChoices):
+    Laboratory = _("Laboratory")
+    Association = _("Association")
+    Dispensary = _("Dispensary")
+    ScientificCompany = _("Scientific Company")
+    PharmaceuticalCompany = _("Pharmaceutical Company")
+    Supplier = _("Supplier")
+    DentalClinic = _("Dental Clinic")
+    PrivateClinic = _("Private Clinic")
+    Butcher = _("Butcher")
+    Grocery = _("Grocery")
+    Barber = _("Barber")
+    Pharmacy = _("Pharmacy")
+    MedicalFacility = _("Medical Facility")
+
+
+# class WeekDay(models.Model):
+#     name = models.CharField(
+#         max_length=15,
+#         primary_key=True,
+#         choices=WeekDays.choices,
+#         verbose_name=_("Name"),
+#     )
+
+#     class Meta:
+#         abstract = True

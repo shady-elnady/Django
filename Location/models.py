@@ -399,7 +399,7 @@ class Linkedin(SocialMediaE):
 
 
 ##
-class Caller(models.Model):
+class Contacts(models.Model):
     way_communicate = models.ManyToManyField(
         WayCommunicate,
         verbose_name=_("Way Communicate"),
@@ -407,8 +407,8 @@ class Caller(models.Model):
     )
 
     class Meta:
-        verbose_name = _("Caller")
-        verbose_name_plural = _("Callers")
+        verbose_name = _("Contacts")
+        verbose_name_plural = _("Contactss")
 
 
 # TODO API FOR COUNTRIES

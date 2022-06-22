@@ -1,11 +1,57 @@
 from django.db import models
+from django.utils.text import slugify
 from django.utils.translation import gettext_lazy as _
 
 from polymorphic.models import PolymorphicModel
-from GraphQL.models import BaseModel, BaseModelLogo, BaseModelName
-from Location.models import Caller
+from GraphQL.models import (
+    BaseModel,
+    BaseModelLogo,
+    BaseModelName,
+    FacilityTypes,
+    Shifts,
+    WeekDays,
+)
+from Location.models import Contacts
 
 # Create your models here.
+
+
+class Shift(PolymorphicModel, BaseModel):  # شفتات ايام الاسبوع
+
+    week_day = models.CharField(
+        max_length=10,
+        choices=WeekDays.choices,
+        verbose_name=_("Week Day"),
+        related_name="%(app_label)s_%(class)s_Week_Day",
+    )
+    shift = models.CharField(
+        max_length=10,
+        choices=Shifts.choices,
+        verbose_name=_("Shift"),
+        related_name="%(app_label)s_%(class)s_Shift",
+    )
+    attending_time = models.TimeField(verbose_name=_("Attending Time"))  # الحضور
+    leaving_time = models.TimeField(verbose_name=_("Leaving Time"))  # الانصراف
+
+    @property
+    def name(self):
+        return f"{self.week_day} - {self.shift}"
+
+    @property
+    def slug(self):
+        return slugify(f"{self.week_day} - {self.shift}")
+
+    def __str__(self):
+        return f"{self.week_day} - {self.shift}"
+
+    @property
+    def shift_hours(self):
+        return self.leaving_time - self.attending_time
+
+    class Meta:
+        unique_together = [["week_day", "shift"]]
+        verbose_name = _("Shift")
+        verbose_name_plural = _("Shifts")
 
 
 class Job(BaseModelName):
@@ -17,21 +63,15 @@ class Job(BaseModelName):
     #     return reverse("_detail", kwargs={"pk": self.pk})
 
 
-class FacilityType(BaseModelName):
-    class Meta:
-        verbose_name = _("Facility Type")
-        verbose_name_plural = _("Facilities Types")
-
-
 class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
     owner = models.ForeignKey(
         to="Persons.Person",
         on_delete=models.CASCADE,
         verbose_name=_("Owner"),
     )
-    facility_type = models.ForeignKey(
-        FacilityType,
-        on_delete=models.CASCADE,
+    facility_type = models.CharField(
+        max_length=35,
+        choice=FacilityTypes.choices,
         verbose_name=_("Facility Type"),
         related_name="%(app_label)s_%(class)s_Facility_Type",
     )
@@ -43,11 +83,11 @@ class Facility(PolymorphicModel, BaseModelLogo):  # منشاءت
 
 class Store(BaseModelName):  # مخازن
 
-    facility = models.ForeignKey(
+    owner_facility = models.ForeignKey(
         Facility,
         on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_facility",
-        verbose_name=_("Facility"),
+        related_name="%(app_label)s_%(class)s_Owner_Facility",
+        verbose_name=_("Owner Facility"),
     )
 
     class Meta:
@@ -60,15 +100,15 @@ class Branch(BaseModelName, BaseModel):
     facility = models.ForeignKey(
         Facility,
         on_delete=models.CASCADE,
-        related_name="%(app_label)s_%(class)s_facility",
+        related_name="%(app_label)s_%(class)s_Facility",
         verbose_name=_("Facility"),
     )
-    caller = models.ForeignKey(
-        Caller,
+    contact_method = models.ForeignKey(
+        Contacts,
         on_delete=models.CASCADE,
-        verbose_name=_("Caller"),
-        related_name="%(app_label)s_%(class)s_Caller",
-    )
+        verbose_name=_("Contact_Method"),
+        related_name="%(app_label)s_%(class)s_Contact_Method",
+    )  # طرق الاتصال
 
     class Meta:
         verbose_name = _("Branch")
@@ -90,6 +130,8 @@ class MobileNetWork(Facility):  # شركات محمول
         verbose_name_plural = _("Mobile NetWorks")
 
 
+"""
+
 class MedicalFacility(Facility):  # منشأه طبيه
     technical_supervisor = models.ForeignKey(
         to="Persons.Person",
@@ -102,12 +144,36 @@ class MedicalFacility(Facility):  # منشأه طبيه
         verbose_name_plural = _("Medical Facilities")
 
 
+class Laboratory(Facility):
+    class Meta:
+        verbose_name = _("Laboratory")
+        verbose_name_plural = _("Laboratories")
 
-"""
+
 class Compony(Facility):  # شركات
     class Meta:
         verbose_name = _("Compony")
         verbose_name_plural = _("Componies")
+
+
+class Shop(Facility):  # المحلات
+    class Meta:
+        verbose_name = _("Shop")
+        verbose_name_plural = _("Shops")
+
+
+class Association(Facility):  # الجمعيات
+    class Meta:
+        verbose_name = _("Association")
+        verbose_name_plural = _("Associations")
+
+
+class Dispensary(MedicalFacility):  #  المستوصفات
+    class Meta:
+        verbose_name = _("Dispensary")
+        verbose_name_plural = _("Dispensaries")
+
+
 
 
 class ScientificCompany(Compony):  # شركات مستلزمات معامل
@@ -154,16 +220,9 @@ class PrivateClinic(Clinic):  # هيادات خاصه
         verbose_name_plural = _("Private Clinics")
 
 
-class Dispensary(MedicalFacility):  #  المستوصفات
-    class Meta:
-        verbose_name = _("Dispensary")
-        verbose_name_plural = _("Dispensaries")
 
 
-class Shop(Facility):  # محل
-    class Meta:
-        verbose_name = _("Shop")
-        verbose_name_plural = _("Shops")
+
 
 
 class Butcher(Shop):  # جزاره
@@ -184,10 +243,6 @@ class Barber(Shop):  # محل حلاقه
         verbose_name_plural = _("Barbers")
 
 
-class Association(Facility):  # الجمعيات
-    class Meta:
-        verbose_name = _("Association")
-        verbose_name_plural = _("Associations")
 
 
 class Department(PolymorphicModel, BaseModelName):
@@ -196,22 +251,6 @@ class Department(PolymorphicModel, BaseModelName):
         verbose_name_plural = _("Departments")
 
 
-class Laboratory(Facility):
-    class Meta:
-        verbose_name = _("Laboratory")
-        verbose_name_plural = _("Laboratories")
-
-
-class MainLab(Laboratory):
-    class Meta:
-        verbose_name = _("Main Laboratory")
-        verbose_name_plural = _("Main Laboratories")
-
-
-class Lab(Laboratory):
-    class Meta:
-        verbose_name = _("Lab")
-        verbose_name_plural = _("Labs")
 
 
 class LabDepartment(Department):
