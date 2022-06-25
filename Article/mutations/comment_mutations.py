@@ -1,7 +1,7 @@
 from Article.models import Article, Comment
 from Article.types import (CommentCreateInputType, CommentDeleteInputType,
                             CommentNode)
-from core.mutations import AppResolverInfo, BaseMutation
+from GraphQL.mutations import AppResolverInfo, BaseMutation
 from graphene import Field, ObjectType
 from graphql import GraphQLError
 from graphql_jwt.decorators import login_required

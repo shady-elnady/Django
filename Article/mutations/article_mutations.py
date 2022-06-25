@@ -12,7 +12,7 @@ from Article.types import (
     ArticleUpdateInputType,
     FavoriteInputType,
 )
-from core.mutations import AppResolverInfo, BaseMutation
+from GraphQL.mutations import AppResolverInfo, BaseMutation
 
 ####################################
 #    Articles Mutations

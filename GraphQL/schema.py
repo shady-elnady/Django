@@ -1,12 +1,12 @@
 from typing import cast
 
-from Articles.mutations.article_mutations import ArticleMutations
-from Articles.mutations.comment_mutations import CommentsMutations
-from Articles.queries import ArticleQuery
+from Article.mutations.article_mutations import ArticleMutations
+from Article.mutations.comment_mutations import CommentsMutations
+from Article.queries import ArticleQuery
 from graphene import Field, ObjectType, Schema
 from graphene_django.debug import DjangoDebug
-from Persons.mutations import UsersMutations
-from Persons.queries import UsersQuery
+from Person.mutations import UsersMutations
+from Person.queries import UsersQuery
 
 
 class AppQuery(UsersQuery, ArticleQuery):
