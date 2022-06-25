@@ -96,6 +96,11 @@ class Shifts(models.TextChoices):
     AfterNoon = _("AfterNoon")
 
 
+class Genders(models.TextChoices):
+    Male = "M", _("Male")
+    FeMale = "F", _("FeMale")
+
+
 class FacilityTypes(models.TextChoices):
     Laboratory = _("Laboratory")
     Association = _("Association")

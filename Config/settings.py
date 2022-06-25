@@ -13,6 +13,7 @@ https://docs.djangoproject.com/en/4.0/ref/settings/
 from pathlib import Path
 from decouple import config
 from datetime import timedelta
+import django
 from django.utils.translation import gettext_lazy as _
 
 
@@ -30,7 +31,7 @@ SECRET_KEY = config("SECRET_KEY")
 DEBUG = config("DEBUG", cast=bool)
 
 
-AUTH_USER_MODEL = "Persons.User"
+AUTH_USER_MODEL = "Person.User"
 
 ALLOWED_HOSTS = [
     "127.0.0.1",
@@ -57,8 +58,6 @@ INSTALLED_APPS = [
     "bootstrap5",
     "countries_plus",
     "languages_plus",
-    # "django_countries",
-    # "cities",
     "django_prices",
     "currencies",
     "crispy_forms",
@@ -88,17 +87,18 @@ INSTALLED_APPS = [
     "allauth.socialaccount.providers.zoom",
     ## My Apps
     "GraphQL",
-    "Languages",
+    "Unit",
+    "Language",
     "Libraries",
     "Utils",
     "Payment",  # ماليات
     "Location",
-    "Facilities",  # منشآت
-    "Persons",
+    "Facility",  # منشآت
+    "Person",
     # 'Persons.apps.UsersConfig',
-    "Products",
+    "Product",
     "Nady_System",
-    "Articles",
+    "Article",
 ]
 
 MIDDLEWARE = [
@@ -110,6 +110,7 @@ MIDDLEWARE = [
     "django.contrib.auth.middleware.AuthenticationMiddleware",
     "django.contrib.messages.middleware.MessageMiddleware",
     "django.middleware.clickjacking.XFrameOptionsMiddleware",
+    "countries_plus.middleware.AddRequestCountryMiddleware", # countries_plus
 ]
 
 ROOT_URLCONF = "Config.urls"
@@ -144,10 +145,14 @@ TEMPLATES = [
             "context_processors": [
                 "django.template.context_processors.debug",
                 "django.template.context_processors.request",  # `allauth` needs this from django
-                "currencies.context_processors.currencies",  #  required for Django Currencies
+                ## django-currencies
+                'django.core.context_processors.request',  # must be enabled
+                "currencies.context_processors.currencies",  #  required for Django-Currencies
+                #
                 "django.contrib.auth.context_processors.auth",
                 "django.template.context_processors.i18n",  # For Translation
                 "django.contrib.messages.context_processors.messages",
+                'countries_plus.context_processors.add_request_country', # django-countries-plus
             ],
         },
     },
@@ -241,16 +246,17 @@ SPAGHETTI_SAUCE = {
     "apps": [
         "auth",
         "GraphQL",
+        "Unit",
         "Libraries",
         "Utils",
-        "Languages",
+        "Language",
         "Location",
         "Payment",  # ماليات
-        "Facilities",  # منشآت
-        "Persons",
-        "Products",
+        "Facility",  # منشآت
+        "Person",
+        "Product",
         "Nady_System",
-        "Articles",
+        "Article",
     ],
     "show_fields": True,
     "exclude": {"auth": ["user"]},
@@ -286,9 +292,11 @@ GRAPHQL_JWT = {
 }
 
 
-LOGIN_REDIRECT_URL = "/"
+LOGIN_URL = "/accounts/login/"
 
-LOGOUT_REDIRECT_URL = "login"
+LOGIN_REDIRECT_URL = "/accounts/profile/"
+
+LOGOUT_REDIRECT_URL = "/"
 
 
 EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
@@ -306,19 +314,34 @@ USE_TZ = True
 
 USE_I18N = True
 
+# If you set this to True, Django will format dates, numbers and calendars
+# according to user current locale.
+USE_L10N = True
+
 LANGUAGE_CODE = "en-us"
 
 LANGUAGES = [
+    ("ar", _("Arabic")),
     ("en", _("English")),
-    ("ar", _("Arabic")),
-    ("ar", _("Arabic")),
+    ("fr", _("french")),
 ]
 
 
 # True for right-to-left languages like Arabic, and to False otherwise
-LANGUAGE_BIDI = False
+# LANGUAGE_BIDI = False
+# Languages using BiDi (right-to-left) layout
+LANGUAGES_BIDI = [
+    "ar",
+    # "he", "ar-dz", "fa", "ur"
+]
 
-LOCALE_PATHS = (BASE_DIR / "locale/",)
+# LOCALE_PATHS = (BASE_DIR / "locale/",)
+LOCALE_PATHS = [
+    BASE_DIR / "Locales/",
+    '/home/www/project/common_files/locale',
+    '/var/local/translations/locale',
+]
+###
 
 
 # Crispy forms
@@ -335,7 +358,7 @@ CRISPY_CLASS_CONVERTERS = {
     "passwordinput": "form-control passwordinput",
     "radioinput": "form-control",
 }
-
+###
 
 GDAL_LIBRARY_PATH = (
     r"E:\Django\Nady Lab System\Django\venv\Lib\site-packages\osgeo\gdal304.dll"
@@ -345,3 +368,18 @@ GDAL_LIBRARY_PATH = (
 GEOS_LIBRARY_PATH = (
     r"E:\Django\Nady Lab System\Django\venv\Lib\site-packages\osgeo\geos_c.dll"
 )
+
+
+# django-currencies
+OPENEXCHANGERATES_APP_ID = config("OPENEXCHANGERATES_APP_ID")
+SHOP_CURRENCIES = ()
+if django.VERSION < (1, 7):
+    INSTALLED_APPS += (
+        'south',
+    )
+###
+
+# django-countries-plus
+COUNTRIES_PLUS_COUNTRY_HEADER = "HTTP_CF_EG"
+COUNTRIES_PLUS_DEFAULT_ISO = "EG"
+###

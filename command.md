@@ -1,4 +1,5 @@
 python3 -m venv venv
+python3 -m virtualenv -p python3.10 venv
 source venv/bin/activate
 python3 -m pip install --upgrade pip
 pip3 install django
@@ -27,18 +28,25 @@ pip3 install django-import-export
 pip3 install django-debug-toolbar
 pip3 install graphene-file-upload
 pip3 install graphene-django-optimizer
-pip install django-bootstrap-v5
-pip install django-languages-plus
-pip install django-countries
-pip install django-allauth
-pip install django-crispy-forms
-pip install django-prices
-pip install django-measurement
-pip install django-pint
-pip install django-cities
-pip install django-currencies
-pip install django-timezone-field
-
+pip3 install django-bootstrap-v5
+pip3 install django-languages-plus
+<!-- pip3 install django-countries -->
+pip3 install django-allauth
+pip3 install django-crispy-forms
+pip3 install django-prices
+pip3 install django-measurement
+pip3 install django-pint
+pip3 install django-cities
+pip3 install django-currencies
+pip3 install django-timezone-field
+pip3 install django-spaghetti-and-meatballs
+pip3 install django-countries-plus
+pip3 install django-languages-plus
+pip3 install django-currencies
+pip3 install django-prices
+pip3 install django-crispy-forms
+pip3 install django-allauth
+pip3 install django-timezone-field
 
 # Commands
 python3 manage.py makemigrations
@@ -48,7 +56,7 @@ pip3 freeze
 pip3 freeze > requirements.txt
 deactivate
 
-    - Languages 
+    - Languages
         python manage.py makemessages -l en
         python manage.py makemessages -l ar
         python manage.py compilemessages

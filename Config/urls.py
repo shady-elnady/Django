@@ -50,8 +50,9 @@ urlpatterns += i18n_patterns(
     path("accounts/", include("allauth.urls")),
     path("admin/", admin.site.urls),
     # path("accounts/", include("django.contrib.auth.urls")),
-    # path("accounts/", include("Persons.urls", namespace="accounts")),
+    # path("accounts/", include("Person.urls", namespace="accounts")),
     path("payment/", include("Payment.urls", namespace="payment")),
+    path('currencies/', include('currencies.urls')),  # django-currencies
 )
 
 urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)

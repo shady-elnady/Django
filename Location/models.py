@@ -2,16 +2,15 @@ from django.db import models
 from django.forms import CharField
 from django.utils.translation import gettext_lazy as _
 from polymorphic.models import PolymorphicModel
-from countries_plus.models import Country as _Country
+from countries_plus.models import Country as BaseCountry
 
 # from django.utils.text import slugify
 from djongo.models import ArrayField
-from timezone_field import TimeZoneField
 
 # from Facilities.models import MobileNetWork
 from GraphQL.models import BaseModel, BaseModelName, BaseModelNative
 from Payment.models import Currency
-from Languages.models import Language
+from Language.models import Language
 
 
 # Create your models here.
@@ -19,13 +18,13 @@ from Languages.models import Language
 
 class Continent(models.Model):
     class Continents(models.TextChoices):
-        AF = _("Africa")
-        AS = _("Asia")
-        EU = _("Europe")
-        NA = _("North America")
-        OC = _("Oceania")
-        SA = _("South America")
-        AN = _("Antarctica")
+        AF = "AF", _("Africa")
+        AS = "AS", _("Asia")
+        EU = "EU", _("Europe")
+        NA = "NA", _("North America")
+        OC = "OC", _("Oceania")
+        SA = "SA", _("South America")
+        AN = "AN", _("Antarctica")
 
     name = models.CharField(
         max_length=2,
@@ -40,36 +39,24 @@ class Continent(models.Model):
         verbose_name_plural = _("Continents")
 
 
-class Country(BaseModel, _Country):
+class Country(BaseModel, BaseModelNative):
     ## https://en.wikipedia.org/wiki/ISO_3166-1#Current_codes
 
-    continents = ArrayField(
-        model_container=Continent,
-        verbose_name=_("Continents"),
+    continent = models.ForeignKey(
+        Continent,
+        on_delete=models.CASCADE,
+        verbose_name=_("Continent"),
+        related_name="%(app_label)s_%(class)s_Continent",
     )
     capital = models.ForeignKey(
         to="City",
-        related_name="%(app_label)s_%(class)s_Capital",
         on_delete=models.CASCADE,
         verbose_name=_("Capital"),
+        related_name="%(app_label)s_%(class)s_Capital",
     )
-    flag = models.CharField(
+    flag_emoji = models.CharField(
         max_length=5,
         verbose_name=_("Flag Emoji"),
-    )
-    flags_svg = models.ImageField(
-        upload_to="svg/flags/",
-        blank=True,
-        null=True,
-        verbose_name=_("Flags SVG"),
-    )
-    postalCode = models.CharField(
-        max_length=5,
-        verbose_name=_("Postal Code"),
-    )
-    timezones = TimeZoneField(
-        default="Africa/Cairo",
-        verbose_name=_("Time Zone"),
     )
     currency = models.ForeignKey(
         Currency,
@@ -77,9 +64,10 @@ class Country(BaseModel, _Country):
         on_delete=models.CASCADE,
         verbose_name=_("Currency"),
     )
-    languages = ArrayField(
-        model_container=Language,
+    languages = models.ManyToManyField(
+        Language,
         verbose_name=_("languages"),
+        related_name="%(app_label)s_%(class)s_languages",
     )
     phone = models.CharField(
         max_length=3,
@@ -87,29 +75,9 @@ class Country(BaseModel, _Country):
     )
 
     @property
-    def continent(self):
-        return self.continent[0]
-
-    @property
-    def currency_code(self):
-        return self.currency.code
-
-    @property
-    def currency_name(self):
-        return self.currency.name
-
-    @property
-    def currency_symbol(self):
-        return self.currency.symbol
-
-    class Meta:
-        verbose_name = _("Country")
-        verbose_name_plural = _("Countries")
-
-        # def get_absolute_url(self):
-        #     return reverse("_detail", kwargs={"pk": self.pk})
-        """_summary_
-
+    def countryInfo(self):
+        return BaseCountry.objects.get(name=self.name)
+    """_summary_
             iso (ISO)
             iso3 (ISO3)
             iso_numeric (ISO-Numeric)
@@ -134,6 +102,15 @@ class Country(BaseModel, _Country):
         Returns:
             _type_: _description_
         """
+
+
+    class Meta:
+        verbose_name = _("Country")
+        verbose_name_plural = _("Countries")
+
+        # def get_absolute_url(self):
+        #     return reverse("_detail", kwargs={"pk": self.pk})
+
 
 
 class Subdivision(BaseModelNative):  # المحافظه

@@ -1,6 +1,7 @@
 from django.db import models
-from GraphQL.models import BaseModelNative
 from django.utils.translation import gettext_lazy as _
+
+from GraphQL.models import BaseModelNative
 
 # Create your models here.
 
